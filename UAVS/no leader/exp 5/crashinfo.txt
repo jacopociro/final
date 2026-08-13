@@ -1,6 +1,6 @@
 CRASH DETECTION REPORT
 ======================
 
-Crash threshold: 10.00 m
+Crash threshold: 5.00 m
 
 No crashes detected.

@@ -4,18 +4,18 @@ Number of experiments: 9
 ========================================
 MISSION FINISH TIMES
 ========================================
-Mean finish time across all UAVs: 312.562 s
-Variance finish time across all UAVs: 3100.174 s²
-Standard deviation finish time across all UAVs: 55.679 s
-Mean finish time UAV 0: 310.045 s
-Variance finish time UAV 0: 2794.033 s²
-Standard deviation finish time UAV 0: 52.859 s
-Mean finish time UAV 1: 313.827 s
-Variance finish time UAV 1: 3248.864 s²
-Standard deviation finish time UAV 1: 56.999 s
-Mean finish time UAV 2: 313.815 s
-Variance finish time UAV 2: 3248.116 s²
-Standard deviation finish time UAV 2: 56.992 s
+Mean finish time across all UAVs: 311.352 s
+Variance finish time across all UAVs: 2988.167 s²
+Standard deviation finish time across all UAVs: 54.664 s
+Mean finish time UAV 0: 309.966 s
+Variance finish time UAV 0: 2789.569 s²
+Standard deviation finish time UAV 0: 52.816 s
+Mean finish time UAV 1: 310.440 s
+Variance finish time UAV 1: 2910.122 s²
+Standard deviation finish time UAV 1: 53.946 s
+Mean finish time UAV 2: 313.649 s
+Variance finish time UAV 2: 3256.777 s²
+Standard deviation finish time UAV 2: 57.068 s
 ========================================
 OBJECTIVE
 ========================================

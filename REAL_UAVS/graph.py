@@ -115,6 +115,18 @@ PRIORITY_FILE_RE = re.compile(
 CRASH_DISPLACEMENT_THRESHOLD = 4.0  # metres
 
 # ---------------------------------------------------------------------------
+# Finish detection
+# ---------------------------------------------------------------------------
+
+FINISH_HOLD_TIME = 0.5  # seconds
+
+# Tolerance used to determine whether the UAV is stationary.
+# Position tolerance is in metres.
+# Yaw tolerance is in radians.
+FINISH_POSITION_TOLERANCE = 0.001  # metres
+FINISH_YAW_TOLERANCE = 0.01       # radians
+
+# ---------------------------------------------------------------------------
 # Coverage
 # ---------------------------------------------------------------------------
 
@@ -139,12 +151,13 @@ WORLD_YMAX = 5.0
 WAYPOINTS = [
     (-2.0, 3.5),
     (1.0, 2.0),
-    (3.0, 2.0),
     (4.0, 3.0),
     (-2.0, 0.0),
     (3.0, -1.0),
 ]
-
+HIDDEN_WAYPOINTS = [
+    (3.0, 2.0),
+]
 # ---------------------------------------------------------------------------
 # Red obstacle markers visible in the supplied map.
 # These are used for plotting. They are treated as point markers and
@@ -291,7 +304,6 @@ def plot_world_walls(ax):
         color="black",
         linewidth=2.5,
         zorder=20,
-        label="Arena",
     )
 
     # Obstacles
@@ -318,6 +330,18 @@ def plot_world_walls(ax):
             s=80,
             zorder=30,
             label="Waypoint",
+        )
+    if HIDDEN_WAYPOINTS:
+        wx, wy = zip(*HIDDEN_WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=2.0,
+            s=80,
+            zorder=30,
+            label="Hidden Waypoint",
         )
 
 
@@ -623,32 +647,289 @@ def save_crash_info(exp_folder: Path, crash_info: dict):
 # TIME / MISSION FILES
 # =============================================================================
 
-def save_finish_times(exp_folder: Path,
-                      exp_data: dict[str, dict]):
+def find_finish_timestamp(
+    timestamp: np.ndarray,
+    position: np.ndarray,
+    hold_time: float = FINISH_HOLD_TIME,
+):
+    """
+    Find the last timestamp at which x, y, z and yaw remain within
+    the specified tolerances for at least hold_time seconds.
+
+    The finish timestamp is the END of the last stationary interval.
+
+    Returns:
+        Absolute finish timestamp, or None if no valid interval exists.
+    """
+    if len(timestamp) < 2 or len(position) < 2:
+        return None
+
+    timestamp = np.asarray(timestamp, dtype=float)
+    position = np.asarray(position, dtype=float)
+
+    if position.shape[1] < 4:
+        return None
+
+    valid = (
+        np.isfinite(timestamp)
+        & np.isfinite(position[:, :4]).all(axis=1)
+    )
+
+    if not np.any(valid):
+        return None
+
+    timestamp = timestamp[valid]
+    position = position[valid]
+
+    if len(timestamp) < 2:
+        return None
+
+    # Differences between consecutive samples.
+    delta_position = np.abs(
+        position[1:, :3] - position[:-1, :3]
+    )
+
+    delta_yaw = np.abs(
+        position[1:, 3] - position[:-1, 3]
+    )
+
+    # A transition is considered stationary when:
+    #
+    # |dx| <= position tolerance
+    # |dy| <= position tolerance
+    # |dz| <= position tolerance
+    # |dyaw| <= yaw tolerance
+    #
+    # for consecutive samples.
+    stationary = (
+        np.all(
+            delta_position
+            <= FINISH_POSITION_TOLERANCE,
+            axis=1,
+        )
+        & (
+            delta_yaw
+            <= FINISH_YAW_TOLERANCE
+        )
+    )
+
+    last_finish_timestamp = None
+
+    # Beginning of the current stationary interval.
+    interval_start = timestamp[0]
+
+    for i in range(1, len(timestamp)):
+
+        if stationary[i - 1]:
+
+            duration = (
+                timestamp[i]
+                - interval_start
+            )
+
+            if duration >= hold_time:
+                last_finish_timestamp = (
+                    timestamp[i]
+                )
+
+        else:
+            # UAV moved outside the tolerance.
+            interval_start = timestamp[i]
+    if last_finish_timestamp is None:
+        last_finish_timestamp = timestamp[len(timestamp) - 1]
+    return last_finish_timestamp
+
+
+def save_finish_times(
+    exp_folder: Path,
+    exp_data: dict[str, dict],
+):
     """
     Save:
         timetofinish_cf_X.txt
 
-    using:
-        last odometry timestamp - first odometry timestamp.
+    The finish time is the END of the last interval in which
+    x, y, z and yaw remain within their respective tolerances
+    for at least FINISH_HOLD_TIME seconds.
+
+    The function also stores the elapsed finish time in:
+        data["finish_time"]
+
+    Returns:
+        Dictionary:
+            {
+                uav_id: finish_time,
+                ...
+            }
+
+        UAVs for which the finish condition is not reached have
+        value None.
+    """
+    finish_times = {}
+
+    for uav_id, data in exp_data.items():
+
+        finish_time = None
+
+        if (
+            "position_timestamp" in data
+            and "position" in data
+        ):
+
+            timestamp = data["position_timestamp"]
+            position = data["position"]
+
+            if len(timestamp) > 0:
+
+                finish_timestamp = find_finish_timestamp(
+                    timestamp,
+                    position,
+                )
+
+                if finish_timestamp is not None:
+                    finish_time = float(
+                        finish_timestamp
+                        - timestamp[0]
+                    )
+
+        # Keep the original finish time in the data structure.
+        data["finish_time"] = finish_time
+
+        finish_times[uav_id] = finish_time
+
+        path = (
+            exp_folder
+            / f"timetofinish_cf_{uav_id}.txt"
+        )
+
+        with path.open(
+            "w",
+            encoding="utf-8",
+        ) as f:
+
+            if finish_time is None:
+                f.write(
+                    "Mission duration: NOT REACHED\n"
+                )
+            else:
+                f.write(
+                    f"Mission duration: "
+                    f"{finish_time:.3f} seconds\n"
+                )
+
+    return finish_times
+
+def trim_data_to_max_finish(
+    exp_data: dict[str, dict],
+    max_finish_time: float,
+):
+    """
+    Trim all UAV time-series data to the maximum finish time
+    of the experiment.
+
+    The finish_time stored in each UAV is NOT modified.
+
+    Each CSV has its own elapsed-time axis, therefore the
+    corresponding absolute timestamp is reconstructed using:
+
+        timestamp[0] + max_finish_time
     """
     for uav_id, data in exp_data.items():
 
-        if "position_timestamp" not in data:
-            continue
+        # --------------------------------------------------------------
+        # Position
+        # --------------------------------------------------------------
 
-        timestamp = data["position_timestamp"]
+        if (
+            "position_timestamp" in data
+            and len(data["position_timestamp"]) > 0
+        ):
 
-        if len(timestamp) == 0:
-            continue
+            timestamp = data["position_timestamp"]
 
-        duration = float(timestamp[-1] - timestamp[0])
+            limit = (
+                timestamp[0]
+                + max_finish_time
+            )
 
-        path = exp_folder / f"timetofinish_cf_{uav_id}.txt"
+            mask = timestamp <= limit
 
-        with path.open("w", encoding="utf-8") as f:
-            f.write(
-                f"Mission duration: {duration:.3f} seconds\n"
+            data["position_timestamp"] = (
+                timestamp[mask]
+            )
+
+            data["position"] = (
+                data["position"][mask]
+            )
+
+            data["position_time"] = (
+                elapsed_time(
+                    data["position_timestamp"]
+                )
+            )
+
+        # --------------------------------------------------------------
+        # Voltage
+        # --------------------------------------------------------------
+
+        if (
+            "voltage_timestamp" in data
+            and len(data["voltage_timestamp"]) > 0
+        ):
+
+            timestamp = data["voltage_timestamp"]
+
+            limit = (
+                timestamp[0]
+                + max_finish_time
+            )
+
+            mask = timestamp <= limit
+
+            data["voltage_timestamp"] = (
+                timestamp[mask]
+            )
+
+            data["voltage"] = (
+                data["voltage"][mask]
+            )
+
+            data["voltage_time"] = (
+                elapsed_time(
+                    data["voltage_timestamp"]
+                )
+            )
+
+        # --------------------------------------------------------------
+        # Priorities
+        # --------------------------------------------------------------
+
+        if (
+            "priority_timestamp" in data
+            and len(data["priority_timestamp"]) > 0
+        ):
+
+            timestamp = data["priority_timestamp"]
+
+            limit = (
+                timestamp[0]
+                + max_finish_time
+            )
+
+            mask = timestamp <= limit
+
+            data["priority_timestamp"] = (
+                timestamp[mask]
+            )
+
+            data["priority"] = (
+                data["priority"][mask]
+            )
+
+            data["priority_time"] = (
+                elapsed_time(
+                    data["priority_timestamp"]
+                )
             )
 
 
@@ -1215,7 +1496,7 @@ def plot_uav_path(
                 x,
                 y,
                 alpha=0.15,
-                label=f"Covered area (r={COVERAGE_RADIUS:g} m)",
+                label=f"Covered area",
             )
 
         elif clipped.geom_type == "MultiPolygon":
@@ -1231,7 +1512,7 @@ def plot_uav_path(
                     y,
                     alpha=0.15,
                     label=(
-                        f"Covered area (r={COVERAGE_RADIUS:g} m)"
+                        f"Covered area"
                         if first
                         else None
                     ),
@@ -1589,7 +1870,7 @@ def plot_experiment_path_and_area(
                 x,
                 y,
                 alpha=0.15,
-                label=f"Covered area (r={COVERAGE_RADIUS:g} m)",
+                label=f"Covered area",
             )
 
         elif clipped.geom_type == "MultiPolygon":
@@ -1605,7 +1886,7 @@ def plot_experiment_path_and_area(
                     y,
                     alpha=0.15,
                     label=(
-                        f"Covered area (r={COVERAGE_RADIUS:g} m)"
+                        f"Covered area"
                         if first
                         else None
                     ),
@@ -2121,7 +2402,7 @@ def plot_aggregated_paths(
             mean[:, 1],
             color=color,
             linewidth=2.0,
-            label=f"UAV {uav_id} mean path",
+            #label=f"UAV {uav_id} mean path",
         )
 
     ax.set_xlabel("x [m]")
@@ -2700,17 +2981,14 @@ def experiment_report_metrics(
 
     for uav_id, data in exp_data.items():
 
-        if "position_timestamp" not in data:
-            continue
-
-        timestamp = data["position_timestamp"]
-
-        if len(timestamp) == 0:
-            continue
-
-        finish_times[uav_id] = float(
-            timestamp[-1] - timestamp[0]
+        finish_time = data.get(
+            "finish_time"
         )
+
+        if finish_time is not None:
+            finish_times[uav_id] = float(
+                finish_time
+            )
 
     # --------------------------------------------------------------
     # Objective
@@ -3334,11 +3612,43 @@ def process_experiment(
         crash_info,
     )
 
-    # Generate timetofinish_cf_X.txt.
-    save_finish_times(
+    # Generate timetofinish_cf_X.txt and determine
+    # the individual finish time of every UAV.
+    finish_times = save_finish_times(
         exp_folder,
         exp_data,
     )
+
+    # --------------------------------------------------------------
+    # Maximum finish time of this experiment
+    # --------------------------------------------------------------
+
+    valid_finish_times = [
+        finish_time
+        for finish_time in finish_times.values()
+        if finish_time is not None
+    ]
+
+    if valid_finish_times:
+
+        max_finish_time = max(
+            valid_finish_times
+        )
+
+        # All plots/data from this experiment are limited
+        # to the finish time of the slowest UAV.
+        trim_data_to_max_finish(
+            exp_data,
+            max_finish_time,
+        )
+
+    else:
+
+        max_finish_time = None
+
+        print(
+            "    WARNING: no UAV reached the finish condition."
+        )
 
     # Generate timetoobjective.txt.
     objective_time = compute_objective_time(

@@ -3,7 +3,7 @@ FINAL REPORT - no leader
 ==================================================
 
 Number of experiments: 6
-Crash threshold: 10.00 m
+Crash threshold: 5.00 m
 Coverage radius: 3.00 m
 
 --------------------------------------------------
@@ -11,7 +11,7 @@ AVERAGE OVER EXPERIMENTS
 --------------------------------------------------
 Mission duration: 110.487 s
 Objective time: 80.201 s
-Covered area: 92.060 %
+Covered area: 92.094 %
 Hidden waypoint found: 72.222 %
 Crash rate: 0.000 %
 
@@ -21,8 +21,8 @@ Mission duration variance: 47.759 s^2
 Mission duration standard deviation: 6.911 s
 Objective time variance: 2.685 s^2
 Objective time standard deviation: 1.639 s
-Covered area variance: 8.305 %^2
-Covered area standard deviation: 2.882 %
+Covered area variance: 8.437 %^2
+Covered area standard deviation: 2.905 %
 Hidden waypoint found variance: 154.321 %^2
 Hidden waypoint found standard deviation: 12.423 %
 Crash rate variance: 0.000 %^2
@@ -35,42 +35,42 @@ INDIVIDUAL EXPERIMENTS
 exp 1
   Mission duration: 96.741 s
   Objective time: 80.934 s
-  Covered area: 90.542 %
+  Covered area: 90.555 %
   Hidden waypoint: 66.667 % (2/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 
 exp 2
   Mission duration: 109.263 s
   Objective time: 80.934 s
-  Covered area: 90.643 %
+  Covered area: 90.666 %
   Hidden waypoint: 66.667 % (2/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 
 exp 3
   Mission duration: 114.319 s
   Objective time: 80.934 s
-  Covered area: 90.122 %
+  Covered area: 90.132 %
   Hidden waypoint: 66.667 % (2/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 
 exp 4
   Mission duration: 116.960 s
   Objective time: 80.934 s
-  Covered area: 92.691 %
+  Covered area: 92.774 %
   Hidden waypoint: 66.667 % (2/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 
 exp 5
   Mission duration: 109.035 s
   Objective time: 80.934 s
-  Covered area: 90.158 %
+  Covered area: 90.162 %
   Hidden waypoint: 66.667 % (2/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 
 exp 6
   Mission duration: 116.604 s
   Objective time: 76.537 s
-  Covered area: 98.204 %
+  Covered area: 98.273 %
   Hidden waypoint: 100.000 % (3/3 UAVs)
   Crashes: 0.000 % (0/3 UAVs)
 

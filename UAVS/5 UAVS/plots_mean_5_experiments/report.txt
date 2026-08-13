@@ -3,7 +3,7 @@ FINAL REPORT - 5 UAVS
 ==================================================
 
 Number of experiments: 6
-Crash threshold: 10.00 m
+Crash threshold: 5.00 m
 Coverage radius: 3.00 m
 
 --------------------------------------------------
@@ -11,7 +11,7 @@ AVERAGE OVER EXPERIMENTS
 --------------------------------------------------
 Mission duration: 133.585 s
 Objective time: 64.204 s
-Covered area: 97.679 %
+Covered area: 97.710 %
 Hidden waypoint found: 56.667 %
 Crash rate: 3.333 %
 
@@ -21,8 +21,8 @@ Mission duration variance: 305.100 s^2
 Mission duration standard deviation: 17.467 s
 Objective time variance: 55.049 s^2
 Objective time standard deviation: 7.419 s
-Covered area variance: 0.196 %^2
-Covered area standard deviation: 0.443 %
+Covered area variance: 0.182 %^2
+Covered area standard deviation: 0.426 %
 Hidden waypoint found variance: 55.556 %^2
 Hidden waypoint found standard deviation: 7.454 %
 Crash rate variance: 55.556 %^2
@@ -35,21 +35,21 @@ INDIVIDUAL EXPERIMENTS
 exp 1
   Mission duration: 117.130 s
   Objective time: 62.145 s
-  Covered area: 97.187 %
+  Covered area: 97.189 %
   Hidden waypoint: 60.000 % (3/5 UAVs)
   Crashes: 0.000 % (0/5 UAVs)
 
 exp 2
   Mission duration: 160.239 s
   Objective time: 71.060 s
-  Covered area: 97.527 %
+  Covered area: 97.565 %
   Hidden waypoint: 60.000 % (3/5 UAVs)
   Crashes: 0.000 % (0/5 UAVs)
 
 exp 3
   Mission duration: 145.036 s
   Objective time: 65.574 s
-  Covered area: 97.822 %
+  Covered area: 97.827 %
   Hidden waypoint: 60.000 % (3/5 UAVs)
   Crashes: 20.000 % (1/5 UAVs)
     UAV 32: iteration 6635, displacement 53.987 m
@@ -57,21 +57,21 @@ exp 3
 exp 4
   Mission duration: 115.912 s
   Objective time: 72.790 s
-  Covered area: 97.597 %
+  Covered area: 97.573 %
   Hidden waypoint: 60.000 % (3/5 UAVs)
   Crashes: 0.000 % (0/5 UAVs)
 
 exp 5
   Mission duration: 117.488 s
   Objective time: 63.706 s
-  Covered area: 98.568 %
+  Covered area: 98.567 %
   Hidden waypoint: 60.000 % (3/5 UAVs)
   Crashes: 0.000 % (0/5 UAVs)
 
 exp 6
   Mission duration: 145.702 s
   Objective time: 49.949 s
-  Covered area: 97.373 %
+  Covered area: 97.538 %
   Hidden waypoint: 40.000 % (2/5 UAVs)
   Crashes: 0.000 % (0/5 UAVs)
 

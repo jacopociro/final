@@ -81,17 +81,17 @@ WAYPOINTS = [
     {"x": 0.78, "y": -0.41},
     {"x": -6.17, "y": 2.00},
     {"x": -8.27, "y": -4.50},
-    {"x": 3.48, "y": 3.17},
+    
 ]
-
+HIDDEN_WAYPOINT = [{"x": 3.48, "y": 3.17},]
 # Cutouts (holes) inside the wall
 # Each is a rectangle: (center x,y + width + height)
 WALL_CUTOUTS = [
     # top-left cutout
-    {"x": -7.0, "y": 4.2, "sx": 7.5, "sy": 2.5},
+    {"x": -7.0, "y": 4.2, "sx": 8.0, "sy": 2.5},
 
     # top-right cutout
-    {"x": 7.5, "y": 4.2, "sx": 6.0, "sy": 2.5},
+    {"x": 7.5, "y": 4.2, "sx": 7.0, "sy": 2.5},
 ]
 
 
@@ -987,10 +987,10 @@ def generate_setting_report(setting_folder: Path):
     return summary
 
 DEFAULT_SETTINGS = [
-    # "1 UAV",
-    # "3 UAVS",
-    # "5 UAVS",
-    # "no leader",
+    "1 UAV",
+    "3 UAVS",
+    "5 UAVS",
+    "no leader",
     "Normal APF",
 ]
 
@@ -1197,9 +1197,8 @@ def build_world_perimeter():
     """
     Build the actual world perimeter.
 
-    The cutouts are open toward the top boundary, so they are represented
-    directly as interruptions of the outer perimeter rather than as holes
-    inside a closed rectangle.
+    Cutouts can intersect the left/right outer walls. When a cutout
+    touches an outer wall, that portion of the outer wall is removed.
     """
 
     xmin = WORLD_OUTER["xmin"]
@@ -1219,7 +1218,7 @@ def build_world_perimeter():
         y0 = cut["y"] - cut["sy"] / 2
         y1 = cut["y"] + cut["sy"] / 2
 
-        # Clip to world boundary.
+        # Clip to world boundary
         x0 = max(xmin, x0)
         x1 = min(xmax, x1)
         y0 = max(ymin, y0)
@@ -1227,62 +1226,143 @@ def build_world_perimeter():
 
         cutouts.append((x0, x1, y0, y1))
 
-    # --------------------------------------------------
-    # Since the cutouts are open at the top, construct
-    # the actual wall segments explicitly.
-    # --------------------------------------------------
+    # Sort cutouts from left to right
+    cutouts.sort(key=lambda c: c[0])
 
     vertices = []
     codes = []
 
+    # --------------------------------------------------
     # Start at bottom-left
+    # --------------------------------------------------
+
     vertices.append((xmin, ymin))
     codes.append(MplPath.MOVETO)
 
-    # Left outer wall
-    vertices.append((xmin, ymax))
-    codes.append(MplPath.LINETO)
+    # --------------------------------------------------
+    # LEFT OUTER WALL
+    #
+    # If a cutout touches xmin, stop the wall at its y0,
+    # go horizontally to x1, then continue vertically
+    # from x1 to ymax.
+    # --------------------------------------------------
+
+    left_cutouts = [
+        c for c in cutouts
+        if np.isclose(c[0], xmin)
+    ]
+
+    if left_cutouts:
+
+        # For the current geometry, use the lowest cutout
+        # touching the left boundary.
+        cut = min(left_cutouts, key=lambda c: c[2])
+
+        x0, x1, y0, y1 = cut
+
+        # Left wall up to bottom of cutout
+        vertices.append((xmin, y0))
+        codes.append(MplPath.LINETO)
+
+        # Bottom edge of cutout
+        vertices.append((x1, y0))
+        codes.append(MplPath.LINETO)
+
+        # Right side of cutout
+        vertices.append((x1, ymax))
+        codes.append(MplPath.LINETO)
+
+    else:
+        # No cutout touches left wall
+        vertices.append((xmin, ymax))
+        codes.append(MplPath.LINETO)
 
     # --------------------------------------------------
-    # Top boundary, from left to right
+    # TOP BOUNDARY
+    #
+    # Process cutouts that are not already connected
+    # to the left wall.
     # --------------------------------------------------
 
-    # Sort cutouts from left to right
-    cutouts.sort(key=lambda c: c[0])
-
-    current_x = xmin
+    current_x = (
+        left_cutouts[0][1]
+        if left_cutouts
+        else xmin
+    )
 
     for x0, x1, y0, y1 in cutouts:
 
-        # Horizontal wall before the cutout
+        # Skip cutout already handled on the left wall
+        if np.isclose(x0, xmin):
+            continue
+
+        # Horizontal top wall before the cutout
         if x0 > current_x:
             vertices.append((x0, ymax))
             codes.append(MplPath.LINETO)
 
-        # Vertical wall on the LEFT side of cutout
+        # Down into cutout
         vertices.append((x0, y0))
         codes.append(MplPath.LINETO)
 
-        # Bottom edge of the cutout
+        # Bottom of cutout
         vertices.append((x1, y0))
         codes.append(MplPath.LINETO)
 
-        # Vertical wall on the RIGHT side of cutout
+        # Back up
         vertices.append((x1, ymax))
         codes.append(MplPath.LINETO)
 
         current_x = x1
 
-    # Horizontal wall after the last cutout
-    if current_x < xmax:
-        vertices.append((xmax, ymax))
+    # --------------------------------------------------
+    # RIGHT OUTER WALL
+    #
+    # If a cutout touches xmax, the right wall must stop
+    # at its y0 instead of continuing through the cutout.
+    # --------------------------------------------------
+
+    right_cutouts = [
+        c for c in cutouts
+        if np.isclose(c[1], xmax)
+    ]
+
+    if right_cutouts:
+
+        cut = min(right_cutouts, key=lambda c: c[2])
+
+        x0, x1, y0, y1 = cut
+
+        # Go horizontally to left side of cutout
+        if current_x < x0:
+            vertices.append((x0, ymax))
+            codes.append(MplPath.LINETO)
+
+        # Down to bottom of cutout
+        vertices.append((x0, y0))
         codes.append(MplPath.LINETO)
 
-    # Right outer wall
-    vertices.append((xmax, ymin))
-    codes.append(MplPath.LINETO)
+        # Bottom edge toward outer wall
+        vertices.append((xmax, y0))
+        codes.append(MplPath.LINETO)
 
+        # Continue down the right outer wall
+        vertices.append((xmax, ymin))
+        codes.append(MplPath.LINETO)
+
+    else:
+        # No cutout touches right wall
+        if current_x < xmax:
+            vertices.append((xmax, ymax))
+            codes.append(MplPath.LINETO)
+
+        vertices.append((xmax, ymin))
+        codes.append(MplPath.LINETO)
+
+    # --------------------------------------------------
     # Bottom wall
+    # --------------------------------------------------
+
     vertices.append((xmin, ymin))
     codes.append(MplPath.CLOSEPOLY)
 
@@ -1344,6 +1424,7 @@ def plot_world_walls(ax):
         [xmin, xmax],
         [ymin, ymin],
         color="black",
+        linestyle="--",
         linewidth=3,
         zorder=20
     )
@@ -1353,6 +1434,7 @@ def plot_world_walls(ax):
         [xmin, xmin],
         [ymin, ymax],
         color="black",
+        linestyle="--",
         linewidth=3,
         zorder=20
     )
@@ -1362,6 +1444,7 @@ def plot_world_walls(ax):
         [xmax, xmax],
         [ymin, ymax],
         color="black",
+        linestyle="--",
         linewidth=3,
         zorder=20
     )
@@ -1381,6 +1464,7 @@ def plot_world_walls(ax):
                 [current_x, x0],
                 [ymax, ymax],
                 color="black",
+                linestyle="--",
                 linewidth=3,
                 zorder=20
             )
@@ -1394,6 +1478,7 @@ def plot_world_walls(ax):
             [current_x, xmax],
             [ymax, ymax],
             color="black",
+            linestyle="--",
             linewidth=3,
             zorder=20
         )
@@ -1414,6 +1499,7 @@ def plot_world_walls(ax):
                 [x0, x0],
                 [y0, ymax],
                 color="black",
+                linestyle="--",
                 linewidth=3,
                 zorder=20
             )
@@ -1425,6 +1511,7 @@ def plot_world_walls(ax):
                 [x1, x1],
                 [y0, ymax],
                 color="black",
+                linestyle="--",
                 linewidth=3,
                 zorder=20
             )
@@ -1434,6 +1521,7 @@ def plot_world_walls(ax):
             [x0, x1],
             [y0, y0],
             color="black",
+            linestyle="--",
             linewidth=3,
             zorder=20
         )
@@ -1793,7 +1881,7 @@ def plot_experiment_photosynthesis(
     )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
 
     savefig(out / "leader_photosynthesis.png")
 
@@ -1862,7 +1950,7 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
                     x,
                     y,
                     alpha=0.15,
-                    label="Covered area (r = 2 m)"
+                    label="Covered area"
                 )
 
             elif coverage.geom_type == "MultiPolygon":
@@ -1875,7 +1963,7 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
                         x,
                         y,
                         alpha=0.15,
-                        label="Covered area (r = 2 m)"
+                        label="Covered area"
                         if first else None
                     )
 
@@ -1887,17 +1975,30 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
             wp["y"],
             marker="o",
             markersize=8,
-            markerfacecolor="yellow",
-            markeredgecolor="black",
+            markerfacecolor="none",
+            markeredgecolor="blue",
             linestyle="None",
-            zorder=30
+            zorder=30,
+            label="Waypoint"
+        )
+    for wp in HIDDEN_WAYPOINT:
+        ax.plot(
+            wp["x"],
+            wp["y"],
+            marker="*",
+            markersize=10,
+            markerfacecolor="midnightblue",
+            markeredgecolor="midnightblue",
+            linestyle="None",
+            zorder=30,
+            label="Hidden waypoint"
         )
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
     ax.set_title(f"{exp_name} - UAV {uav_id} - 2D path")
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
 
     savefig(out / "path_2d.png")
 
@@ -1931,7 +2032,7 @@ def plot_priorities(uav_id: str, data: dict, out: Path, exp_name: str):
     ax.set_ylabel("Priority")
     ax.set_title(f"{exp_name} - UAV {uav_id} - Resource priorities")
     ax.grid(True, alpha=0.3)
-    ax.legend(ncol=2)
+    ax.legend(loc="upper left", ncol=2)
     savefig(out / "priorities.png")
 
     # Dedicated battery-priority graph.
@@ -2115,7 +2216,7 @@ def plot_experiment_distances(exp_data, out, exp_name):
     ax.set_ylabel("Distance [m]")
     ax.set_title(f"{exp_name} - Inter-UAV distances")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
     savefig(out / "uav_distances.png")
 
 
@@ -2144,11 +2245,25 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
             wp["y"],
             marker="o",
             markersize=8,
-            markerfacecolor="yellow",
-            markeredgecolor="black",
+            markerfacecolor="none",
+            markeredgecolor="blue",
             linestyle="None",
-            zorder=30
+            zorder=30,
+            label="Waypoint"
         )
+    for wp in HIDDEN_WAYPOINT:
+        ax.plot(
+            wp["x"],
+            wp["y"],
+            marker="*",
+            markersize=10,
+            markerfacecolor="midnightblue",
+            markeredgecolor="midnightblue",
+            linestyle="None",
+            zorder=30,
+            label="Hidden waypoint"
+        )
+    
     # ------------------------------------------------------------------
     # Final covered area:
     # union of all radius-2 m circles centered at all visited positions
@@ -2166,7 +2281,7 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
                 x,
                 y,
                 alpha=0.15,
-                label="Covered area (r = 2 m)"
+                label="Covered area"
             )
 
         elif coverage.geom_type == "MultiPolygon":
@@ -2181,7 +2296,7 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
                     x,
                     y,
                     alpha=0.15,
-                    label="Covered area (r = 2 m)"
+                    label="Covered area"
                     if first else None
                 )
 
@@ -2211,7 +2326,7 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
     ax.set_title(f"{exp_name} - UAV paths and covered area")
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
 
     savefig(out / "paths_and_covered_area.png")
 
@@ -2327,7 +2442,7 @@ def plot_aggregated_leader_photosynthesis(
     )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
 
     savefig(out / "mean_leader_photosynthesis.png")
 
@@ -2352,7 +2467,7 @@ def plot_aggregated_positions(position_stats, out, setting_name):
             ax.grid(True, alpha=0.3)
 
         axes[-1].set_xlabel("Iteration")
-        axes[0].legend()
+        axes[0].legend(loc="upper left", ncol=2)
         fig.suptitle(f"{setting_name} - UAV {uav_id} - Mean position ± std")
         savefig(out / f"mean_position_UAV_{uav_id}.png")
 
@@ -2388,7 +2503,7 @@ def plot_aggregated_scalar_per_uav(stats, out, setting_name, key, ylabel, filena
         ax.set_ylabel(ylabel)
         ax.set_title(f"{setting_name} - UAV {uav_id} - {ylabel} - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        ax.legend(loc="upper left", ncol=2)
         savefig(out / f"{filename}_UAV_{uav_id}.png")
 
 
@@ -2441,7 +2556,7 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
         ax.set_ylabel("Priority")
         ax.set_title(f"{setting_name} - UAV {uav_id} - Priorities - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend(ncol=2)
+        ax.legend(loc="upper left", ncol=2)
         savefig(out / f"mean_priorities_UAV_{uav_id}.png")
 
         # Battery priority separately
@@ -2458,7 +2573,7 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
         ax.set_ylabel("Battery priority")
         ax.set_title(f"{setting_name} - UAV {uav_id} - Battery priority - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        ax.legend(loc="upper left", ncol=2)
         savefig(out / f"mean_battery_priority_UAV_{uav_id}.png")
 
 
@@ -2515,7 +2630,7 @@ def plot_aggregated_distances(distance_stats, out, setting_name):
     ax.set_ylabel("Distance [m]")
     ax.set_title(f"{setting_name} - Inter-UAV distance - Mean ± std")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(loc="upper left", ncol=2)
     savefig(out / "mean_uav_distances.png")
 
 
@@ -2546,17 +2661,29 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     # ------------------------------------------------------------------
     # WAYPOINTS
     # ------------------------------------------------------------------
-
     for wp in WAYPOINTS:
         ax.plot(
             wp["x"],
             wp["y"],
             marker="o",
             markersize=8,
-            markerfacecolor="yellow",
-            markeredgecolor="black",
+            markerfacecolor="none",
+            markeredgecolor="blue",
             linestyle="None",
-            zorder=30
+            zorder=30,
+            label="Waypoint"
+        )
+    for wp in HIDDEN_WAYPOINT:
+        ax.plot(
+            wp["x"],
+            wp["y"],
+            marker="*",
+            markersize=10,
+            markerfacecolor="midnightblue",
+            markeredgecolor="midnightblue",
+            linestyle="None",
+            zorder=30,
+            label="Hidden waypoint"
         )
 
     # ------------------------------------------------------------------
@@ -2758,7 +2885,8 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
 
     ax.legend(
         handles=handles,
-        loc="upper right"
+        loc="upper left", 
+        ncol=2
     )
 
     savefig(
