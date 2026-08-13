@@ -1,0 +1,76 @@
+==================================================
+FINAL REPORT - 1 UAV
+==================================================
+
+Number of experiments: 6
+Crash threshold: 10.00 m
+Coverage radius: 3.00 m
+
+--------------------------------------------------
+AVERAGE OVER EXPERIMENTS
+--------------------------------------------------
+Mission duration: 103.484 s
+Objective time: 71.900 s
+Covered area: 83.064 %
+Hidden waypoint found: 100.000 %
+Crash rate: 0.000 %
+
+VARIANCE OVER EXPERIMENTS
+--------------------------------------------------
+Mission duration variance: 56.543 s^2
+Mission duration standard deviation: 7.520 s
+Objective time variance: 40.614 s^2
+Objective time standard deviation: 6.373 s
+Covered area variance: 0.036 %^2
+Covered area standard deviation: 0.190 %
+Hidden waypoint found variance: 0.000 %^2
+Hidden waypoint found standard deviation: 0.000 %
+Crash rate variance: 0.000 %^2
+Crash rate standard deviation: 0.000 %
+
+--------------------------------------------------
+INDIVIDUAL EXPERIMENTS
+--------------------------------------------------
+
+exp 1
+  Mission duration: 97.014 s
+  Objective time: 66.042 s
+  Covered area: 83.232 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+
+exp 2
+  Mission duration: 102.693 s
+  Objective time: 70.268 s
+  Covered area: 83.168 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+
+exp 3
+  Mission duration: 105.163 s
+  Objective time: 74.548 s
+  Covered area: 83.058 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+
+exp 4
+  Mission duration: 108.667 s
+  Objective time: 76.045 s
+  Covered area: 83.090 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+
+exp 5
+  Mission duration: 115.237 s
+  Objective time: 81.794 s
+  Covered area: 83.177 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+
+exp 6
+  Mission duration: 92.128 s
+  Objective time: 62.701 s
+  Covered area: 82.658 %
+  Hidden waypoint: 100.000 % (1/1 UAVs)
+  Crashes: 0.000 % (0/1 UAVs)
+

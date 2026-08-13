@@ -1,0 +1,7 @@
+Crash displacement threshold: 4.000 m
+
+UAV 0: NO CRASH DETECTED
+UAV 1: NO CRASH DETECTED
+UAV 2: NO CRASH DETECTED
+
+Experiment crash status: NO CRASH

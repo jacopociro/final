@@ -1,0 +1,110 @@
+SETTING: 3 UAVs
+Number of experiments: 9
+
+========================================
+MISSION FINISH TIMES
+========================================
+Mean finish time across all UAVs: 312.562 s
+Variance finish time across all UAVs: 3100.174 s²
+Standard deviation finish time across all UAVs: 55.679 s
+Mean finish time UAV 0: 310.045 s
+Variance finish time UAV 0: 2794.033 s²
+Standard deviation finish time UAV 0: 52.859 s
+Mean finish time UAV 1: 313.827 s
+Variance finish time UAV 1: 3248.864 s²
+Standard deviation finish time UAV 1: 56.999 s
+Mean finish time UAV 2: 313.815 s
+Variance finish time UAV 2: 3248.116 s²
+Standard deviation finish time UAV 2: 56.992 s
+========================================
+OBJECTIVE
+========================================
+Criterion: for every resource column Priority_0...Priority_5, at least one UAV must have priority < 1. Priority_6 (battery) is excluded.
+Mean objective time (successful experiments only): 78.757 s
+Variance objective time (successful experiments only): 211.804 s²
+Standard deviation objective time (successful experiments only): 14.554 s
+Experiments reaching objective: 9/9 (100.00%)
+
+========================================
+COVERAGE
+========================================
+Mean covered area: 90.864%
+Variance covered area: 26.874 %²
+Standard deviation covered area: 5.184 %
+
+========================================
+HIDDEN WAYPOINT
+========================================
+Criterion: penultimate priority column is non-zero at the end of the UAV experiment.
+Mean percentage of UAVs finding hidden waypoint: 46.296%
+Variance percentage of UAVs finding hidden waypoint: 233.196 %²
+Standard deviation percentage of UAVs finding hidden waypoint: 15.271 %
+
+========================================
+CRASHES
+========================================
+Experiments with at least one crash: 1/9 (11.11%)
+Variance experiment crash percentage: 987.654 %²
+Standard deviation experiment crash percentage: 31.427 %
+UAV crash percentage: 3.70%
+Variance UAV crash percentage: 109.739 %²
+Standard deviation UAV crash percentage: 10.476 %
+UAV crash percentage: 3.70%
+
+========================================
+PER-EXPERIMENT RESULTS
+========================================
+
+Experiment 1
+  Coverage: 94.054%
+  Hidden waypoint: 66.667%
+  Objective time: 77.422 s
+  Crashed UAVs: None
+
+Experiment 2
+  Coverage: 94.345%
+  Hidden waypoint: 66.667%
+  Objective time: 95.416 s
+  Crashed UAVs: None
+
+Experiment 3
+  Coverage: 76.674%
+  Hidden waypoint: 33.333%
+  Objective time: 75.452 s
+  Crashed UAVs: None
+
+Experiment 4
+  Coverage: 92.118%
+  Hidden waypoint: 33.333%
+  Objective time: 79.819 s
+  Crashed UAVs: None
+
+Experiment 5
+  Coverage: 91.706%
+  Hidden waypoint: 33.333%
+  Objective time: 67.681 s
+  Crashed UAVs: None
+
+Experiment 6
+  Coverage: 90.821%
+  Hidden waypoint: 33.333%
+  Objective time: 109.096 s
+  Crashed UAVs: None
+
+Experiment 7
+  Coverage: 93.395%
+  Hidden waypoint: 50.000%
+  Objective time: 55.878 s
+  Crashed UAVs: 0
+
+Experiment 8
+  Coverage: 90.711%
+  Hidden waypoint: 66.667%
+  Objective time: 72.695 s
+  Crashed UAVs: None
+
+Experiment 9
+  Coverage: 93.949%
+  Hidden waypoint: 33.333%
+  Objective time: 75.356 s
+  Crashed UAVs: None

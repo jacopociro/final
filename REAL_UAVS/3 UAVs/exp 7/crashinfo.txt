@@ -1,0 +1,10 @@
+Crash displacement threshold: 4.000 m
+
+UAV 0: CRASH DETECTED
+  Position sample index: 8312
+  Absolute timestamp: 368.234674
+  Displacement: 12.635626 m
+UAV 1: NO CRASH DETECTED
+UAV 2: NO CRASH DETECTED
+
+Experiment crash status: CRASH
