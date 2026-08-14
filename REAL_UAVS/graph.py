@@ -196,6 +196,8 @@ OBSTACLES.extend([
     (-0.5, 1.0),
     (0.0, 1.0),
 ])
+# cs = 4.0, -4.5
+CHARGING_STATION = [(4.0, -4.5),]
 
 DPI = 180
 FIGSIZE = (10, 6)
@@ -336,7 +338,7 @@ def plot_world_walls(ax):
             wx,
             wy,
             facecolors="none",
-            edgecolors="blue",
+            edgecolors="olive",
             linewidths=2.0,
             s=80,
             zorder=30,
@@ -354,7 +356,10 @@ def plot_world_walls(ax):
             zorder=30,
             label="Hidden Waypoint",
         )
-
+    for cs in CHARGING_STATION:
+        circle = plt.Rectangle((cs[0] - 2, cs[1] - 2), 4, 4, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
+        
 
 # =============================================================================
 # DATA LOADING
@@ -1444,6 +1449,51 @@ def plot_uav_position(
     )
 
 
+def plot_world(
+
+    out: Path,
+
+):
+
+    fig, ax = plt.subplots(
+        figsize=FIGSIZE
+    )
+
+    plot_world_walls(ax)
+
+    # cs = 4.0, -4.5
+    # init pos cf0 -2, -1 cf1 2-0, -1 cf2 0 -4
+    init_pos = [
+        (-2.0, -1.0, 0),
+        (2.0, -1.0, 1),
+        (0.0, -4.0, 2),
+    ]
+    colors = ['blue', 'orange', 'green', 'red', 'purple']
+    for i, (x,y,id) in enumerate(init_pos):
+        ax.scatter(
+            x,
+            y,
+            facecolors="none",
+            edgecolors=colors[i],
+            linewidths=2.0,
+            s=80,
+            zorder=30,
+            label=f"UAV {id}",
+        )
+    ax.set_xlabel("x [m]")
+    ax.set_ylabel("y [m]")
+
+
+    ax.set_xlim(WORLD_XMIN, WORLD_XMAX)
+    ax.set_ylim(WORLD_YMIN, WORLD_YMAX)
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    savefig(
+        out / "wolrd.png"
+    )
+
 def plot_uav_path(
     uav_id: str,
     data: dict,
@@ -1547,7 +1597,6 @@ def plot_uav_path(
     savefig(
         out / "path_2d.png"
     )
-
 
 def plot_uav_priorities(
     uav_id: str,
@@ -3960,7 +4009,8 @@ def main():
             ]
         )
     )
-
+    print("Saving world plot")
+    plot_world(root)
     for setting in settings:
         process_setting(setting)
 
