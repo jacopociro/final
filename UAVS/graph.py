@@ -76,14 +76,195 @@ WORLD_OUTER = {
 # Waypoints
 # --------------------------------------------------
 WAYPOINTS = [
-    {"x": 6.55, "y": 0.95},
-    {"x": -0.56, "y": 4.11},
-    {"x": 0.78, "y": -0.41},
-    {"x": -6.17, "y": 2.00},
-    {"x": -8.27, "y": -4.50},
+    (6.55, 0.95),
+    (-0.56, 4.11),
+    (0.78, -0.41),
+    (-6.17, 2.00),
+    (-8.27, -4.50),
     
 ]
-HIDDEN_WAYPOINT = [{"x": 3.48, "y": 3.17},]
+HIDDEN_WAYPOINT = [(3.48,3.17),]
+
+CHARGIN_STATION = [(6, -3),]
+OBSTACLES = [
+
+    # ============================================================
+    # WALLS
+    # ============================================================
+    # ============================================================
+    # INTERNAL WALL / STRUCTURE
+    # ============================================================
+
+    # Folding door / wall around bedroom
+    (-2.46, -6.00),
+    (-2.46, -5.50),
+    (-2.46, -5.00),
+    (-2.46, -4.50),
+    (-2.46, -4.00),
+    (-2.46, -3.50),
+    (-2.46, -3.00),
+    (-2.46, -2.50),
+    (-2.46, -2.00),
+    (-2.46,  0.00),
+    (-2.46,  0.50),
+    (-2.46,  1.00),
+    (-2.46,  1.50),
+    (-2.46,  2.00),
+    (-2.46,  2.50),
+    (-2.46,  3.00),
+
+
+    # ============================================================
+    # BED
+    # ============================================================
+
+    (-7.05, 1.45),
+    (-7.05, 2.05),
+    (-7.05, 2.60),
+    (-6.45, 1.45),
+    (-6.45, 2.05),
+    (-6.45, 2.60),
+    (-5.85, 1.45),
+    (-5.85, 2.05),
+    (-5.85, 2.60),
+    (-5.25, 1.45),
+    (-5.25, 2.05),
+    (-5.25, 2.60),
+
+    # Nightstands
+    (-7.73, 2.86),
+    (-4.41, 2.86),
+
+    # Wardrobe
+    (-3.65, 2.10),
+    (-3.65, 2.50),
+    (-3.65, 2.90),
+    (-3.15, 2.10),
+    (-3.15, 2.50),
+    (-3.15, 2.90),
+    (-2.65, 2.10),
+    (-2.65, 2.50),
+    (-2.65, 2.90),
+
+    # Desk and chair
+    (-8.99, 2.06),
+    (-8.27, 1.92),
+
+    # Trash
+    (-8.70, 1.00),
+
+    # ============================================================
+    # LIVING ROOM
+    # ============================================================
+
+    # Sofa
+    (-0.45, -1.05),
+    (-0.45, -0.50),
+    (-0.45,  0.05),
+    ( 0.15, -1.05),
+    ( 0.15, -0.50),
+    ( 0.15,  0.05),
+    ( 0.75, -1.05),
+    ( 0.75, -0.50),
+    ( 0.75,  0.05),
+    ( 1.35, -1.05),
+    ( 1.35, -0.50),
+    ( 1.35,  0.05),
+
+    # Coffee table
+    (1.51, -1.73),
+
+    # TV cabinet
+    (-0.15, -5.18),
+    ( 0.40, -5.18),
+    ( 0.95, -5.18),
+    ( 1.50, -5.18),
+
+    # TV
+    (0.82, -5.38),
+
+    # Trash
+    (2.36, -0.80),
+
+    # Balls
+    (3.30, 4.23),
+    (-6.95, -4.22),
+
+    # ============================================================
+    # DINING AREA
+    # ============================================================
+
+    # Kitchen table
+    (5.95, 0.35),
+    (5.95, 0.95),
+    (5.95, 1.55),
+    (6.55, 0.35),
+    (6.55, 0.95),
+    (6.55, 1.55),
+    (7.15, 0.35),
+    (7.15, 0.95),
+    (7.15, 1.55),
+
+    # Chairs
+    (7.12, 0.21),
+    (6.26, 0.22),
+    (6.07, 1.68),
+    (7.00, 1.67),
+
+    # ============================================================
+    # BALCONY
+    # ============================================================
+
+    # Balcony table
+    (-0.56, 4.11),
+
+    # Balcony chairs
+    (-1.38, 4.10),
+    (0.33, 4.10),
+    (-8.27, -4.50),
+
+    # ============================================================
+    # KITCHEN
+    # ============================================================
+
+    # Cooking bench
+    (8.60, -3.80),
+    (8.60, -3.35),
+    (8.60, -2.90),
+    (9.00, -3.80),
+    (9.00, -3.35),
+    (9.00, -2.90),
+
+    # Kitchen cabinet
+    (8.00, -3.84),
+
+    # Refrigerator
+    (8.70, -1.55),
+    (8.70, -1.05),
+    (8.70, -0.55),
+
+    # Fitness equipment
+    (3.48, 3.17),
+
+    # Dumbbell
+    (2.51, 2.72),
+
+    # ============================================================
+    # DOORS
+    # ============================================================
+
+    (6.00, -5.55),
+    (-2.46, 1.84),
+    (-2.46, -4.05),
+    (4.67, 2.46),
+    (4.89, -4.85),
+
+    # ============================================================
+    # SMALL OBJECTS
+    # ============================================================
+
+    (-2.00, -5.23),
+]
 # Cutouts (holes) inside the wall
 # Each is a rectangle: (center x,y + width + height)
 WALL_CUTOUTS = [
@@ -1904,6 +2085,76 @@ def plot_uav_position(uav_id: str, data: dict, out: Path, exp_name: str):
     fig.suptitle(f"{exp_name} - UAV {uav_id} - Position")
     savefig(out / "position_time.png")
 
+def plot_world(out: Path):
+
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    init_pos = [
+        (4.0, -3.0, 28),
+        (6.0, -3.0, 29),
+        (5.0, -2.0, 30),
+        (4.0, -1.0, 31),
+        (6.0, -1.0, 32),
+    ]
+    colors = ['blue', 'orange', 'green', 'red', 'purple']
+    for i, (x,y,id) in enumerate(init_pos):
+        ax.scatter(
+            x,
+            y,
+            facecolors="none",
+            edgecolors=colors[i],
+            linewidths=2.0,
+            s=80,
+            zorder=30,
+            label=f"UAV {id}",
+        )
+    plot_world_walls(ax)
+    if WAYPOINTS:
+        wx, wy = zip(*WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="none",
+            edgecolors="olive",
+            linewidths=2.0,
+            s=80,
+            zorder=30,
+            label="POI",
+        )
+    if HIDDEN_WAYPOINT:
+        wx, wy = zip(*HIDDEN_WAYPOINT)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=2.0,
+            s=80,
+            zorder=30,
+            label="Hidden POI",
+        )
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=55,
+            zorder=25,
+            label="Obstacle",
+        )
+
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
+        
+    ax.set_xlabel("x [m]")
+    ax.set_ylabel("y [m]")
+    ax.set_title(f"world")
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper left", ncol=2)
+
+    savefig(out / "world.png")
 
 def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
     if "position" not in data:
@@ -1969,30 +2220,43 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
 
                     first = False
     plot_world_walls(ax)
-    for wp in WAYPOINTS:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="o",
-            markersize=8,
-            markerfacecolor="none",
-            markeredgecolor="blue",
-            linestyle="None",
+    if WAYPOINTS:
+        wx, wy = zip(*WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="none",
+            edgecolors="olive",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Waypoint"
+            label="POI",
         )
-    for wp in HIDDEN_WAYPOINT:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="*",
-            markersize=10,
-            markerfacecolor="midnightblue",
-            markeredgecolor="midnightblue",
-            linestyle="None",
+    if HIDDEN_WAYPOINT:
+        wx, wy = zip(*HIDDEN_WAYPOINT)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Hidden waypoint"
+            label="Hidden POI",
         )
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=55,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
     ax.set_title(f"{exp_name} - UAV {uav_id} - 2D path")
@@ -2239,31 +2503,43 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
 
     fig, ax = plt.subplots(figsize=FIGSIZE)
     plot_world_walls(ax)
-    for wp in WAYPOINTS:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="o",
-            markersize=8,
-            markerfacecolor="none",
-            markeredgecolor="blue",
-            linestyle="None",
+    if WAYPOINTS:
+        wx, wy = zip(*WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="none",
+            edgecolors="olive",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Waypoint"
+            label="POI",
         )
-    for wp in HIDDEN_WAYPOINT:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="*",
-            markersize=10,
-            markerfacecolor="midnightblue",
-            markeredgecolor="midnightblue",
-            linestyle="None",
+    if HIDDEN_WAYPOINT:
+        wx, wy = zip(*HIDDEN_WAYPOINT)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Hidden waypoint"
+            label="Hidden POI",
         )
-    
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=55,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
     # ------------------------------------------------------------------
     # Final covered area:
     # union of all radius-2 m circles centered at all visited positions
@@ -2661,30 +2937,44 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     # ------------------------------------------------------------------
     # WAYPOINTS
     # ------------------------------------------------------------------
-    for wp in WAYPOINTS:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="o",
-            markersize=8,
-            markerfacecolor="none",
-            markeredgecolor="blue",
-            linestyle="None",
+
+    if WAYPOINTS:
+        wx, wy = zip(*WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="none",
+            edgecolors="olive",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Waypoint"
+            label="POI",
         )
-    for wp in HIDDEN_WAYPOINT:
-        ax.plot(
-            wp["x"],
-            wp["y"],
-            marker="*",
-            markersize=10,
-            markerfacecolor="midnightblue",
-            markeredgecolor="midnightblue",
-            linestyle="None",
+    if HIDDEN_WAYPOINT:
+        wx, wy = zip(*HIDDEN_WAYPOINT)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=2.0,
+            s=80,
             zorder=30,
-            label="Hidden waypoint"
+            label="Hidden POI",
         )
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=55,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
 
     # ------------------------------------------------------------------
     # MEAN SPATIAL COVERAGE
@@ -2898,6 +3188,7 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
 # ---------------------------------------------------------------------------
 
 def process_setting(setting_folder: Path):
+    
     print(f"\nProcessing setting: {setting_folder.name}")
 
     exp_folders = get_experiment_folders(setting_folder)
@@ -3006,7 +3297,8 @@ def main():
 
     print(f"Root: {root}")
     print(f"Settings: {[p.name for p in settings]}")
-
+    print("Saving wolrd plot")
+    plot_world(root)
     for setting in settings:
         process_setting(setting)
 
