@@ -1,55 +1,55 @@
 SETTING: 3 UAVs
-Number of experiments: 9
+Number of experiments: 8
 
 ========================================
 MISSION FINISH TIMES
 ========================================
-Mean finish time across all UAVs: 311.352 s
-Variance finish time across all UAVs: 2988.167 s²
-Standard deviation finish time across all UAVs: 54.664 s
-Mean finish time UAV 0: 309.966 s
-Variance finish time UAV 0: 2789.569 s²
-Standard deviation finish time UAV 0: 52.816 s
-Mean finish time UAV 1: 310.440 s
-Variance finish time UAV 1: 2910.122 s²
-Standard deviation finish time UAV 1: 53.946 s
-Mean finish time UAV 2: 313.649 s
-Variance finish time UAV 2: 3256.777 s²
-Standard deviation finish time UAV 2: 57.068 s
+Mean finish time across all UAVs: 321.503 s
+Variance finish time across all UAVs: 2434.147 s²
+Standard deviation finish time across all UAVs: 49.337 s
+Mean finish time UAV 0: 320.014 s
+Variance finish time UAV 0: 2229.628 s²
+Standard deviation finish time UAV 0: 47.219 s
+Mean finish time UAV 1: 320.440 s
+Variance finish time UAV 1: 2373.828 s²
+Standard deviation finish time UAV 1: 48.722 s
+Mean finish time UAV 2: 324.056 s
+Variance finish time UAV 2: 2689.118 s²
+Standard deviation finish time UAV 2: 51.857 s
 ========================================
 OBJECTIVE
 ========================================
 Criterion: for every resource column Priority_0...Priority_5, at least one UAV must have priority < 1. Priority_6 (battery) is excluded.
-Mean objective time (successful experiments only): 78.757 s
-Variance objective time (successful experiments only): 211.804 s²
-Standard deviation objective time (successful experiments only): 14.554 s
-Experiments reaching objective: 9/9 (100.00%)
+Mean objective time (successful experiments only): 79.170 s
+Variance objective time (successful experiments only): 236.744 s²
+Standard deviation objective time (successful experiments only): 15.386 s
+Experiments reaching objective: 8/8 (100.00%)
 
 ========================================
 COVERAGE
 ========================================
-Mean covered area: 90.864%
-Variance covered area: 26.874 %²
-Standard deviation covered area: 5.184 %
+Mean covered area: 92.637%
+Variance covered area: 1.921 %²
+Standard deviation covered area: 1.386 %
 
 ========================================
 HIDDEN WAYPOINT
 ========================================
 Criterion: penultimate priority column is non-zero at the end of the UAV experiment.
-Mean percentage of UAVs finding hidden waypoint: 46.296%
-Variance percentage of UAVs finding hidden waypoint: 233.196 %²
-Standard deviation percentage of UAVs finding hidden waypoint: 15.271 %
+Mean percentage of UAVs finding hidden waypoint: 47.917%
+Variance percentage of UAVs finding hidden waypoint: 238.715 %²
+Standard deviation percentage of UAVs finding hidden waypoint: 15.450 %
 
 ========================================
 CRASHES
 ========================================
-Experiments with at least one crash: 1/9 (11.11%)
-Variance experiment crash percentage: 987.654 %²
-Standard deviation experiment crash percentage: 31.427 %
-UAV crash percentage: 3.70%
-Variance UAV crash percentage: 109.739 %²
-Standard deviation UAV crash percentage: 10.476 %
-UAV crash percentage: 3.70%
+Experiments with at least one crash: 1/8 (12.50%)
+Variance experiment crash percentage: 1093.750 %²
+Standard deviation experiment crash percentage: 33.072 %
+UAV crash percentage: 4.17%
+Variance UAV crash percentage: 121.528 %²
+Standard deviation UAV crash percentage: 11.024 %
+UAV crash percentage: 4.17%
 
 ========================================
 PER-EXPERIMENT RESULTS
@@ -68,42 +68,36 @@ Experiment 2
   Crashed UAVs: None
 
 Experiment 3
-  Coverage: 76.674%
-  Hidden waypoint: 33.333%
-  Objective time: 75.452 s
-  Crashed UAVs: None
-
-Experiment 4
   Coverage: 92.118%
   Hidden waypoint: 33.333%
   Objective time: 79.819 s
   Crashed UAVs: None
 
-Experiment 5
+Experiment 4
   Coverage: 91.706%
   Hidden waypoint: 33.333%
   Objective time: 67.681 s
   Crashed UAVs: None
 
-Experiment 6
+Experiment 5
   Coverage: 90.821%
   Hidden waypoint: 33.333%
   Objective time: 109.096 s
   Crashed UAVs: None
 
-Experiment 7
+Experiment 6
   Coverage: 93.395%
   Hidden waypoint: 50.000%
   Objective time: 55.878 s
   Crashed UAVs: 0
 
-Experiment 8
+Experiment 7
   Coverage: 90.711%
   Hidden waypoint: 66.667%
   Objective time: 72.695 s
   Crashed UAVs: None
 
-Experiment 9
+Experiment 8
   Coverage: 93.949%
   Hidden waypoint: 33.333%
   Objective time: 75.356 s

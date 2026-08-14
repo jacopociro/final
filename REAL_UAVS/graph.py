@@ -357,7 +357,7 @@ def plot_world_walls(ax):
             label="Hidden Waypoint",
         )
     for cs in CHARGING_STATION:
-        circle = plt.Rectangle((cs[0] - 2, cs[1] - 2), 4, 4, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        circle = plt.Rectangle((cs[0] - 3, cs[1] - 3), 6, 6, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
         ax.add_patch(circle)
         
 
