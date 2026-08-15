@@ -106,6 +106,54 @@ PRIORITY_FILE_RE = re.compile(
     r"^priority_cf_(\d+)\.csv$",
     re.IGNORECASE,
 )
+plt.rcParams.update({
+    # =========================
+    # FONT
+    # =========================
+    'font.family': 'serif',
+    'font.size': 8,
+
+    # =========================
+    # AXES
+    # =========================
+    'axes.titlesize': 9,
+    'axes.labelsize': 8,
+
+    # =========================
+    # TICKS
+    # =========================
+    'xtick.labelsize': 7,
+    'ytick.labelsize': 7,
+
+    # =========================
+    # LEGEND
+    # =========================
+    'legend.fontsize': 7,
+
+    # =========================
+    # LINES
+    # =========================
+    'lines.linewidth': 1.2,
+    'lines.markersize': 0.1,
+    # =========================
+    # AXES STYLE
+    # =========================
+    'axes.linewidth': 0.8,
+    'xtick.major.width': 0.8,
+    'ytick.major.width': 0.8,
+
+    # =========================
+    # FIGURE
+    # =========================
+    'figure.dpi': 150,
+    'savefig.dpi': 300,
+
+    # =========================
+    # OUTPUT
+    # =========================
+    'savefig.bbox': 'tight',
+})
+SCATTER_MARKER_SIZE = 10
 
 # ---------------------------------------------------------------------------
 # Crash detection
@@ -199,8 +247,8 @@ OBSTACLES.extend([
 # cs = 4.0, -4.5
 CHARGING_STATION = [(4.0, -4.5),]
 
-DPI = 180
-FIGSIZE = (10, 6)
+DPI = 150
+FIGSIZE = (4.0, 3.0)
 
 # Number of points used for common-time interpolation in aggregate plots.
 AGGREGATION_POINTS = 500
@@ -326,10 +374,13 @@ def plot_world_walls(ax):
             ox,
             oy,
             color="red",
-            s=55,
+            s=SCATTER_MARKER_SIZE,
             zorder=25,
             label="Obstacle",
         )
+    for cs in CHARGING_STATION:
+        circle = plt.Rectangle((cs[0] - 3, cs[1] - 3), 6, 6, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
 
     # Waypoints
     if WAYPOINTS:
@@ -337,12 +388,12 @@ def plot_world_walls(ax):
         ax.scatter(
             wx,
             wy,
-            facecolors="none",
-            edgecolors="olive",
+            facecolors="green",
+            edgecolors="green",
             linewidths=2.0,
-            s=80,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
-            label="Waypoint",
+            label="POI",
         )
     if HIDDEN_WAYPOINTS:
         wx, wy = zip(*HIDDEN_WAYPOINTS)
@@ -351,14 +402,12 @@ def plot_world_walls(ax):
             wy,
             facecolors="midnightblue",
             edgecolors="midnightblue",
-            linewidths=2.0,
-            s=80,
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
-            label="Hidden Waypoint",
+            label="Hidden POI",
         )
-    for cs in CHARGING_STATION:
-        circle = plt.Rectangle((cs[0] - 3, cs[1] - 3), 6, 6, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
-        ax.add_patch(circle)
+    
         
 
 # =============================================================================
@@ -1417,7 +1466,7 @@ def plot_uav_position(
     fig, axes = plt.subplots(
         4,
         1,
-        figsize=(10, 10),
+        figsize=FIGSIZE,
         sharex=True,
     )
 
@@ -1445,7 +1494,7 @@ def plot_uav_position(
     )
 
     savefig(
-        out / "position_time.png"
+        out / "position_time.pdf"
     )
 
 
@@ -1456,8 +1505,7 @@ def plot_world(
 ):
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     plot_world_walls(ax)
 
@@ -1476,7 +1524,7 @@ def plot_world(
             facecolors="none",
             edgecolors=colors[i],
             linewidths=2.0,
-            s=80,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label=f"UAV {id}",
         )
@@ -1488,10 +1536,16 @@ def plot_world(
     ax.set_ylim(WORLD_YMIN, WORLD_YMAX)
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "wolrd.png"
+        out / "wolrd.pdf"
     )
 
 def plot_uav_path(
@@ -1513,8 +1567,7 @@ def plot_uav_path(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     plot_world_walls(ax)
 
@@ -1529,7 +1582,7 @@ def plot_uav_path(
         xy[0, 0],
         xy[0, 1],
         marker="o",
-        s=50,
+        s=SCATTER_MARKER_SIZE*2,
         label="Start",
     )
 
@@ -1537,7 +1590,7 @@ def plot_uav_path(
         xy[-1, 0],
         xy[-1, 1],
         marker="x",
-        s=60,
+        s=SCATTER_MARKER_SIZE*2,
         label="End",
     )
 
@@ -1584,18 +1637,24 @@ def plot_uav_path(
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
 
-    ax.set_title(
-        f"{exp_name} - UAV {uav_id} - 2D path"
-    )
+    #ax.set_title(
+    #     f"{exp_name} - UAV {uav_id} - 2D path"
+    # )
 
     ax.set_xlim(WORLD_XMIN, WORLD_XMAX)
     ax.set_ylim(WORLD_YMIN, WORLD_YMAX)
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "path_2d.png"
+        out / "path_2d.pdf"
     )
 
 def plot_uav_priorities(
@@ -1627,8 +1686,7 @@ def plot_uav_priorities(
             )
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     for i, label in enumerate(labels):
         ax.plot(
@@ -1640,21 +1698,26 @@ def plot_uav_priorities(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Priority")
 
-    ax.set_title(
-        f"{exp_name} - UAV {uav_id} - Resource priorities"
-    )
+    #ax.set_title(
+    #     f"{exp_name} - UAV {uav_id} - Resource priorities"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend(ncol=2)
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "priorities.png"
+        out / "priorities.pdf"
     )
 
     # Battery priority separately.
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     ax.plot(
         t,
@@ -1664,14 +1727,14 @@ def plot_uav_priorities(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Battery priority")
 
-    ax.set_title(
-        f"{exp_name} - UAV {uav_id} - Battery priority"
-    )
+    #ax.set_title(
+    #     f"{exp_name} - UAV {uav_id} - Battery priority"
+    # )
 
     ax.grid(True, alpha=0.3)
 
     savefig(
-        out / "battery_priority.png"
+        out / "battery_priority.pdf"
     )
 
 
@@ -1691,8 +1754,7 @@ def plot_uav_voltage(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     ax.plot(
         t,
@@ -1702,14 +1764,14 @@ def plot_uav_voltage(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Voltage [V]")
 
-    ax.set_title(
-        f"{exp_name} - UAV {uav_id} - Battery voltage"
-    )
+    # #ax.set_title(
+    #     f"{exp_name} - UAV {uav_id} - Battery voltage"
+    # )
 
     ax.grid(True, alpha=0.3)
 
     savefig(
-        out / "voltage.png"
+        out / "voltage.pdf"
     )
 
 
@@ -1848,8 +1910,7 @@ def plot_experiment_distances(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     for pair, (t, d) in zip(
         pairs,
@@ -1865,15 +1926,21 @@ def plot_experiment_distances(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Distance [m]")
 
-    ax.set_title(
-        f"{exp_name} - Inter-UAV distances"
-    )
+    #ax.set_title(
+    #     f"{exp_name} - Inter-UAV distances"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "uav_distances.png"
+        out / "uav_distances.pdf"
     )
 
 
@@ -1906,8 +1973,7 @@ def plot_experiment_path_and_area(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     plot_world_walls(ax)
 
@@ -1969,24 +2035,30 @@ def plot_experiment_path_and_area(
         ax.scatter(
             xy[0, 0],
             xy[0, 1],
-            s=35,
+            s=SCATTER_MARKER_SIZE,
         )
 
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
 
-    ax.set_title(
-        f"{exp_name} - UAV paths and covered area"
-    )
+    #ax.set_title(
+    #     f"{exp_name} - UAV paths and covered area"
+    # )
 
     ax.set_xlim(WORLD_XMIN, WORLD_XMAX)
     ax.set_ylim(WORLD_YMIN, WORLD_YMAX)
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "paths_and_covered_area.png"
+        out / "paths_and_covered_area.pdf"
     )
 
 
@@ -2268,7 +2340,7 @@ def plot_aggregated_positions(
         fig, axes = plt.subplots(
             4,
             1,
-            figsize=(10, 10),
+            figsize=FIGSIZE,
             sharex=True,
         )
 
@@ -2308,7 +2380,7 @@ def plot_aggregated_positions(
 
         savefig(
             out /
-            f"mean_position_UAV_{uav_id}.png"
+            f"mean_position_UAV_{uav_id}.pdf"
         )
 
 
@@ -2382,8 +2454,7 @@ def plot_aggregated_paths(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     plot_world_walls(ax)
 
@@ -2468,10 +2539,10 @@ def plot_aggregated_paths(
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
 
-    ax.set_title(
-        f"{setting_name} - Mean UAV paths "
-        f"± std area"
-    )
+    #ax.set_title(
+    #     f"{setting_name} - Mean UAV paths "
+    #     f"± std area"
+    # )
 
     ax.set_xlim(
         WORLD_XMIN,
@@ -2489,10 +2560,16 @@ def plot_aggregated_paths(
     )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "mean_paths.png"
+        out / "mean_paths.pdf"
     )
 
 
@@ -2547,8 +2624,7 @@ def plot_aggregated_coverage(
     std = np.sqrt(variance)
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     ax.plot(
         t,
@@ -2571,15 +2647,21 @@ def plot_aggregated_coverage(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Covered area [%]")
 
-    ax.set_title(
-        f"{setting_name} - Mean covered area ± std"
-    )
+    #ax.set_title(
+    #     f"{setting_name} - Mean covered area ± std"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "mean_covered_area.png"
+        out / "mean_covered_area.pdf"
     )
 
 
@@ -2696,8 +2778,7 @@ def plot_aggregated_priorities(
                 )
 
         fig, ax = plt.subplots(
-            figsize=FIGSIZE
-        )
+            figsize=FIGSIZE        )
 
         for i, label in enumerate(labels):
 
@@ -2717,23 +2798,28 @@ def plot_aggregated_priorities(
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Priority")
 
-        ax.set_title(
-            f"{setting_name} - UAV {uav_id} "
-            f"- Priorities - Mean ± std"
-        )
+        #ax.set_title(
+        #     f"{setting_name} - UAV {uav_id} "
+        #     f"- Priorities - Mean ± std"
+        # )
 
         ax.grid(True, alpha=0.3)
-        ax.legend(ncol=2)
+        ax.grid(True, alpha=0.3)
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
 
         savefig(
             out /
-            f"mean_priorities_UAV_{uav_id}.png"
+            f"mean_priorities_UAV_{uav_id}.pdf"
         )
 
         # Battery priority separately
         fig, ax = plt.subplots(
-            figsize=FIGSIZE
-        )
+            figsize=FIGSIZE        )
 
         ax.plot(
             t,
@@ -2752,17 +2838,23 @@ def plot_aggregated_priorities(
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Battery priority")
 
-        ax.set_title(
-            f"{setting_name} - UAV {uav_id} "
-            f"- Battery priority - Mean ± std"
-        )
+        #ax.set_title(
+        #     f"{setting_name} - UAV {uav_id} "
+        #     f"- Battery priority - Mean ± std"
+        # )
 
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        ax.grid(True, alpha=0.3)
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
 
         savefig(
             out /
-            f"mean_battery_priority_UAV_{uav_id}.png"
+            f"mean_battery_priority_UAV_{uav_id}.pdf"
         )
 
 
@@ -2827,8 +2919,7 @@ def plot_aggregated_voltage(
         std = np.sqrt(variance)
 
         fig, ax = plt.subplots(
-            figsize=FIGSIZE
-        )
+            figsize=FIGSIZE        )
 
         ax.plot(
             t,
@@ -2847,17 +2938,23 @@ def plot_aggregated_voltage(
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Voltage [V]")
 
-        ax.set_title(
-            f"{setting_name} - UAV {uav_id} "
-            f"- Voltage - Mean ± std"
-        )
+        #ax.set_title(
+        #     f"{setting_name} - UAV {uav_id} "
+        #     f"- Voltage - Mean ± std"
+        # )
 
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        ax.grid(True, alpha=0.3)
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
 
         savefig(
             out /
-            f"mean_voltage_UAV_{uav_id}.png"
+            f"mean_voltage_UAV_{uav_id}.pdf"
         )
 
 
@@ -2936,8 +3033,7 @@ def plot_aggregated_distances(
         return
 
     fig, ax = plt.subplots(
-        figsize=FIGSIZE
-    )
+        figsize=FIGSIZE    )
 
     for pair, (
         t,
@@ -2965,16 +3061,22 @@ def plot_aggregated_distances(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Distance [m]")
 
-    ax.set_title(
-        f"{setting_name} - Inter-UAV distance "
-        f"- Mean ± std"
-    )
+    #ax.set_title(
+    #     f"{setting_name} - Inter-UAV distance "
+    #     f"- Mean ± std"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.33),
+        ncol=3,
+        frameon=False
+    )
 
     savefig(
-        out / "mean_uav_distances.png"
+        out / "mean_uav_distances.pdf"
     )
 
 

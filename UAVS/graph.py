@@ -286,6 +286,55 @@ WALL_CUTOUTS = [
 CRASH_DISTANCE_THRESHOLD = 5.0 # meters
 
 TIME_PER_ITERATION = 1# seconds
+
+plt.rcParams.update({
+    # =========================
+    # FONT
+    # =========================
+    'font.family': 'serif',
+    'font.size': 8,
+
+    # =========================
+    # AXES
+    # =========================
+    'axes.titlesize': 9,
+    'axes.labelsize': 8,
+
+    # =========================
+    # TICKS
+    # =========================
+    'xtick.labelsize': 7,
+    'ytick.labelsize': 7,
+
+    # =========================
+    # LEGEND
+    # =========================
+    'legend.fontsize': 7,
+
+    # =========================
+    # LINES
+    # =========================
+    'lines.linewidth': 1.2,
+    'lines.markersize': 0.1,
+    # =========================
+    # AXES STYLE
+    # =========================
+    'axes.linewidth': 0.8,
+    'xtick.major.width': 0.8,
+    'ytick.major.width': 0.8,
+
+    # =========================
+    # FIGURE
+    # =========================
+    'figure.dpi': 150,
+    'savefig.dpi': 300,
+
+    # =========================
+    # OUTPUT
+    # =========================
+    'savefig.bbox': 'tight',
+})
+SCATTER_MARKER_SIZE = 10
 # ---------------------------------------------------------------------------
 # FINAL REPORT
 # ---------------------------------------------------------------------------
@@ -1188,8 +1237,8 @@ PHOTOSYNTHESIS_CANDIDATES = [
     "photosynthesis_production.csv",
 ]
 
-DPI = 180
-FIGSIZE = (10, 6)
+DPI = 150
+FIGSIZE = (4.0, 3.0)
 
 
 # ---------------------------------------------------------------------------
@@ -2057,14 +2106,21 @@ def plot_experiment_photosynthesis(
 
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Photosynthetic production")
-    ax.set_title(
-        f"{exp_name} - Leader - Photosynthetic production"
-    )
+    # #ax.set_title(
+    #     f"{exp_name} - Leader - Photosynthetic production"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
 
-    savefig(out / "leader_photosynthesis.png")
+    
+
+    savefig(out / "leader_photosynthesis.pdf")
 
 def plot_uav_position(uav_id: str, data: dict, out: Path, exp_name: str):
     if "position" not in data:
@@ -2082,8 +2138,8 @@ def plot_uav_position(uav_id: str, data: dict, out: Path, exp_name: str):
         ax.grid(True, alpha=0.3)
 
     axes[-1].set_xlabel("Iteration")
-    fig.suptitle(f"{exp_name} - UAV {uav_id} - Position")
-    savefig(out / "position_time.png")
+    # fig.suptitle(f"{exp_name} - UAV {uav_id} - Position")
+    savefig(out / "position_time.pdf")
 
 def plot_world(out: Path):
 
@@ -2102,21 +2158,36 @@ def plot_world(out: Path):
             y,
             facecolors="none",
             edgecolors=colors[i],
-            linewidths=2.0,
-            s=80,
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE,
             zorder=30,
             label=f"UAV {id}",
         )
     plot_world_walls(ax)
+
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=SCATTER_MARKER_SIZE,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
+    
     if WAYPOINTS:
         wx, wy = zip(*WAYPOINTS)
         ax.scatter(
             wx,
             wy,
-            facecolors="none",
-            edgecolors="olive",
-            linewidths=2.0,
-            s=80,
+            facecolors="green",
+            edgecolors="green",
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="POI",
         )
@@ -2127,34 +2198,30 @@ def plot_world(out: Path):
             wy,
             facecolors="midnightblue",
             edgecolors="midnightblue",
-            linewidths=2.0,
-            s=80,
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="Hidden POI",
         )
-    if OBSTACLES:
-        ox, oy = zip(*OBSTACLES)
-        ax.scatter(
-            ox,
-            oy,
-            color="red",
-            s=55,
-            zorder=25,
-            label="Obstacle",
-        )
 
-    for cs in CHARGIN_STATION:
-        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
-        ax.add_patch(circle)
+
+
         
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
-    ax.set_title(f"world")
+    ##ax.set_title(f"world")
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
 
-    savefig(out / "world.png")
+    
+
+    savefig(out / "world.pdf")
 
 def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
     if "position" not in data:
@@ -2166,6 +2233,44 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
     xy = xy[valid]
 
     fig, ax = plt.subplots(figsize=FIGSIZE)
+    plot_world_walls(ax)
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=SCATTER_MARKER_SIZE,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
+    if WAYPOINTS:
+        wx, wy = zip(*WAYPOINTS)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="green",
+            edgecolors="green",
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
+            zorder=30,
+            label="POI",
+        )
+    if HIDDEN_WAYPOINT:
+        wx, wy = zip(*HIDDEN_WAYPOINT)
+        ax.scatter(
+            wx,
+            wy,
+            facecolors="midnightblue",
+            edgecolors="midnightblue",
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
+            zorder=30,
+            label="Hidden POI",
+        )
 
     if len(xy):
         ax.plot(
@@ -2179,7 +2284,7 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
             xy[0, 0],
             xy[0, 1],
             marker="o",
-            s=50,
+            s=SCATTER_MARKER_SIZE*3,
             label="Start"
         )
 
@@ -2187,7 +2292,7 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
             xy[-1, 0],
             xy[-1, 1],
             marker="x",
-            s=60,
+            s=SCATTER_MARKER_SIZE*3,
             label="End"
         )
 
@@ -2219,52 +2324,24 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
                     )
 
                     first = False
-    plot_world_walls(ax)
-    if WAYPOINTS:
-        wx, wy = zip(*WAYPOINTS)
-        ax.scatter(
-            wx,
-            wy,
-            facecolors="none",
-            edgecolors="olive",
-            linewidths=2.0,
-            s=80,
-            zorder=30,
-            label="POI",
-        )
-    if HIDDEN_WAYPOINT:
-        wx, wy = zip(*HIDDEN_WAYPOINT)
-        ax.scatter(
-            wx,
-            wy,
-            facecolors="midnightblue",
-            edgecolors="midnightblue",
-            linewidths=2.0,
-            s=80,
-            zorder=30,
-            label="Hidden POI",
-        )
-    if OBSTACLES:
-        ox, oy = zip(*OBSTACLES)
-        ax.scatter(
-            ox,
-            oy,
-            color="red",
-            s=55,
-            zorder=25,
-            label="Obstacle",
-        )
-    for cs in CHARGIN_STATION:
-        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
-        ax.add_patch(circle)
+
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
-    ax.set_title(f"{exp_name} - UAV {uav_id} - 2D path")
+    #ax.set_title(f"{exp_name} - UAV {uav_id} - 2D path")
     ax.set_aspect("equal", adjustable="box")
+    ax.set_xlim(WORLD_OUTER["xmin"] - 1, WORLD_OUTER["xmax"] + 1)
+    ax.set_ylim(WORLD_OUTER["ymin"] - 1, WORLD_OUTER["ymax"] + 1)
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
 
-    savefig(out / "path_2d.png")
+    
+
+    savefig(out / "path_2d.pdf")
 
 
 
@@ -2294,10 +2371,17 @@ def plot_priorities(uav_id: str, data: dict, out: Path, exp_name: str):
 
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Priority")
-    ax.set_title(f"{exp_name} - UAV {uav_id} - Resource priorities")
+    #ax.set_title(f"{exp_name} - UAV {uav_id} - Resource priorities")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
-    savefig(out / "priorities.png")
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
+
+    
+    savefig(out / "priorities.pdf")
 
     # Dedicated battery-priority graph.
     if n >= 1:
@@ -2305,9 +2389,9 @@ def plot_priorities(uav_id: str, data: dict, out: Path, exp_name: str):
         ax.plot(t, pr[:, -1])
         ax.set_xlabel("Iteration")
         ax.set_ylabel("Battery priority")
-        ax.set_title(f"{exp_name} - UAV {uav_id} - Battery priority")
+        #ax.set_title(f"{exp_name} - UAV {uav_id} - Battery priority")
         ax.grid(True, alpha=0.3)
-        savefig(out / "battery_priority.png")
+        savefig(out / "battery_priority.pdf")
 
 
 def plot_voltage(uav_id: str, data: dict, out: Path, exp_name: str):
@@ -2321,9 +2405,9 @@ def plot_voltage(uav_id: str, data: dict, out: Path, exp_name: str):
     ax.plot(t, v)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Voltage [V]")
-    ax.set_title(f"{exp_name} - UAV {uav_id} - Battery voltage")
+    #ax.set_title(f"{exp_name} - UAV {uav_id} - Battery voltage")
     ax.grid(True, alpha=0.3)
-    savefig(out / "voltage.png")
+    savefig(out / "voltage.pdf")
 
 
 def plot_photosynthesis(uav_id: str, data: dict, out: Path, exp_name: str):
@@ -2337,9 +2421,9 @@ def plot_photosynthesis(uav_id: str, data: dict, out: Path, exp_name: str):
     ax.plot(t, p)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Photosynthetic production")
-    ax.set_title(f"{exp_name} - UAV {uav_id} - Photosynthetic production")
+    #ax.set_title(f"{exp_name} - UAV {uav_id} - Photosynthetic production")
     ax.grid(True, alpha=0.3)
-    savefig(out / "photosynthesis.png")
+    savefig(out / "photosynthesis.pdf")
 
 
 def make_individual_uav_plots(uav_id, data, out, exp_name):
@@ -2478,10 +2562,17 @@ def plot_experiment_distances(exp_data, out, exp_name):
 
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Distance [m]")
-    ax.set_title(f"{exp_name} - Inter-UAV distances")
+    #ax.set_title(f"{exp_name} - Inter-UAV distances")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
-    savefig(out / "uav_distances.png")
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
+
+    
+    savefig(out / "uav_distances.pdf")
 
 
 def plot_experiment_path_and_area(exp_data, out, exp_name):
@@ -2502,16 +2593,30 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
         return
 
     fig, ax = plt.subplots(figsize=FIGSIZE)
-    plot_world_walls(ax)
+    plot_world_walls(ax)    
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=SCATTER_MARKER_SIZE,
+            zorder=25,
+            label="Obstacle",
+        )
+
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
     if WAYPOINTS:
         wx, wy = zip(*WAYPOINTS)
         ax.scatter(
             wx,
             wy,
-            facecolors="none",
-            edgecolors="olive",
-            linewidths=2.0,
-            s=80,
+            facecolors="green",
+            edgecolors="green",
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="POI",
         )
@@ -2522,24 +2627,13 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
             wy,
             facecolors="midnightblue",
             edgecolors="midnightblue",
-            linewidths=2.0,
-            s=80,
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="Hidden POI",
         )
-    if OBSTACLES:
-        ox, oy = zip(*OBSTACLES)
-        ax.scatter(
-            ox,
-            oy,
-            color="red",
-            s=55,
-            zorder=25,
-            label="Obstacle",
-        )
-    for cs in CHARGIN_STATION:
-        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
-        ax.add_patch(circle)
+
+
     # ------------------------------------------------------------------
     # Final covered area:
     # union of all radius-2 m circles centered at all visited positions
@@ -2594,17 +2688,26 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
         ax.scatter(
             xy[0, 0],
             xy[0, 1],
-            s=35
+            s=SCATTER_MARKER_SIZE
         )
 
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
-    ax.set_title(f"{exp_name} - UAV paths and covered area")
+    #ax.set_title(f"{exp_name} - UAV paths and covered area")
     ax.set_aspect("equal", adjustable="box")
+    ax.set_xlim(WORLD_OUTER["xmin"] - 1, WORLD_OUTER["xmax"] + 1)
+    ax.set_ylim(WORLD_OUTER["ymin"] - 1, WORLD_OUTER["ymax"] + 1)
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
 
-    savefig(out / "paths_and_covered_area.png")
+    
+
+    savefig(out / "paths_and_covered_area.pdf")
 
 
 def make_experiment_plots(exp_folder, exp_data):
@@ -2712,15 +2815,22 @@ def plot_aggregated_leader_photosynthesis(
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Photosynthetic production")
 
-    ax.set_title(
-        f"{setting_name} - Leader photosynthetic production "
-        f"- Mean ± std"
-    )
+    #ax.set_title(
+    #     f"{setting_name} - Leader photosynthetic production "
+    #     f"- Mean ± std"
+    # )
 
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
 
-    savefig(out / "mean_leader_photosynthesis.png")
+    
+
+    savefig(out / "mean_leader_photosynthesis.pdf")
 
 def plot_aggregated_positions(position_stats, out, setting_name):
     for uav_id, (mean, var) in position_stats.items():
@@ -2745,7 +2855,7 @@ def plot_aggregated_positions(position_stats, out, setting_name):
         axes[-1].set_xlabel("Iteration")
         axes[0].legend(loc="upper left", ncol=2)
         fig.suptitle(f"{setting_name} - UAV {uav_id} - Mean position ± std")
-        savefig(out / f"mean_position_UAV_{uav_id}.png")
+        savefig(out / f"mean_position_UAV_{uav_id}.pdf")
 
 
 def aggregate_scalar_per_uav(all_exp_data, key):
@@ -2777,10 +2887,17 @@ def plot_aggregated_scalar_per_uav(stats, out, setting_name, key, ylabel, filena
         ax.fill_between(t, mean - std, mean + std, alpha=0.2, label="±1 std")
         ax.set_xlabel("Iteration")
         ax.set_ylabel(ylabel)
-        ax.set_title(f"{setting_name} - UAV {uav_id} - {ylabel} - Mean ± std")
+        #ax.set_title(f"{setting_name} - UAV {uav_id} - {ylabel} - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend(loc="upper left", ncol=2)
-        savefig(out / f"{filename}_UAV_{uav_id}.png")
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
+
+        
+        savefig(out / f"{filename}_UAV_{uav_id}.pdf")
 
 
 def aggregate_priorities(all_exp_data):
@@ -2830,10 +2947,17 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
 
         ax.set_xlabel("Iteration")
         ax.set_ylabel("Priority")
-        ax.set_title(f"{setting_name} - UAV {uav_id} - Priorities - Mean ± std")
+        #ax.set_title(f"{setting_name} - UAV {uav_id} - Priorities - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend(loc="upper left", ncol=2)
-        savefig(out / f"mean_priorities_UAV_{uav_id}.png")
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
+
+        
+        savefig(out / f"mean_priorities_UAV_{uav_id}.pdf")
 
         # Battery priority separately
         fig, ax = plt.subplots(figsize=FIGSIZE)
@@ -2847,10 +2971,17 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
         )
         ax.set_xlabel("Iteration")
         ax.set_ylabel("Battery priority")
-        ax.set_title(f"{setting_name} - UAV {uav_id} - Battery priority - Mean ± std")
+        #ax.set_title(f"{setting_name} - UAV {uav_id} - Battery priority - Mean ± std")
         ax.grid(True, alpha=0.3)
-        ax.legend(loc="upper left", ncol=2)
-        savefig(out / f"mean_battery_priority_UAV_{uav_id}.png")
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.33),
+            ncol=3,
+            frameon=False
+        )
+
+        
+        savefig(out / f"mean_battery_priority_UAV_{uav_id}.pdf")
 
 
 def aggregate_distances(all_exp_data):
@@ -2904,10 +3035,17 @@ def plot_aggregated_distances(distance_stats, out, setting_name):
 
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Distance [m]")
-    ax.set_title(f"{setting_name} - Inter-UAV distance - Mean ± std")
+    #ax.set_title(f"{setting_name} - Inter-UAV distance - Mean ± std")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper left", ncol=2)
-    savefig(out / "mean_uav_distances.png")
+    ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, 1.33),
+    ncol=3,
+    frameon=False
+)
+
+    
+    savefig(out / "mean_uav_distances.pdf")
 
 
 def aggregate_paths(all_exp_data):
@@ -2937,16 +3075,28 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     # ------------------------------------------------------------------
     # WAYPOINTS
     # ------------------------------------------------------------------
-
+    if OBSTACLES:
+        ox, oy = zip(*OBSTACLES)
+        ax.scatter(
+            ox,
+            oy,
+            color="red",
+            s=SCATTER_MARKER_SIZE,
+            zorder=25,
+            label="Obstacle",
+        )
+    for cs in CHARGIN_STATION:
+        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
+        ax.add_patch(circle)
     if WAYPOINTS:
         wx, wy = zip(*WAYPOINTS)
         ax.scatter(
             wx,
             wy,
-            facecolors="none",
-            edgecolors="olive",
-            linewidths=2.0,
-            s=80,
+            facecolors="green",
+            edgecolors="green",
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="POI",
         )
@@ -2957,24 +3107,12 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
             wy,
             facecolors="midnightblue",
             edgecolors="midnightblue",
-            linewidths=2.0,
-            s=80,
+            linewidths=1.0,
+            s=SCATTER_MARKER_SIZE*3,
             zorder=30,
             label="Hidden POI",
         )
-    if OBSTACLES:
-        ox, oy = zip(*OBSTACLES)
-        ax.scatter(
-            ox,
-            oy,
-            color="red",
-            s=55,
-            zorder=25,
-            label="Obstacle",
-        )
-    for cs in CHARGIN_STATION:
-        circle = plt.Circle((cs[0], cs[1]), 2, fill=False, color="cyan", linewidth=2.0, zorder=20, label="Charging area")
-        ax.add_patch(circle)
+
 
     # ------------------------------------------------------------------
     # MEAN SPATIAL COVERAGE
@@ -3149,16 +3287,17 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
 
-    ax.set_title(
-        f"{setting_name} - Mean UAV paths, "
-        f"coverage and variability"
-    )
+    #ax.set_title(
+    #     f"{setting_name} - Mean UAV paths, "
+    #     f"coverage and variability"
+    # )
 
     ax.set_aspect(
         "equal",
         adjustable="box"
     )
-
+    ax.set_xlim(WORLD_OUTER["xmin"] - 1, WORLD_OUTER["xmax"] + 1)
+    ax.set_ylim(WORLD_OUTER["ymin"] - 1, WORLD_OUTER["ymax"] + 1)
     ax.grid(
         True,
         alpha=0.3
@@ -3180,7 +3319,7 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     )
 
     savefig(
-        out / "mean_paths.png"
+        out / "mean_paths.pdf"
     )
 
 # ---------------------------------------------------------------------------
