@@ -2120,7 +2120,7 @@ def plot_experiment_photosynthesis(
 
     
 
-    savefig(out / "leader_photosynthesis.pdf")
+    savefig(out / "leader_photosynthesis.png")
 
 def plot_uav_position(uav_id: str, data: dict, out: Path, exp_name: str):
     if "position" not in data:
@@ -2139,7 +2139,7 @@ def plot_uav_position(uav_id: str, data: dict, out: Path, exp_name: str):
 
     axes[-1].set_xlabel("Iteration")
     # fig.suptitle(f"{exp_name} - UAV {uav_id} - Position")
-    savefig(out / "position_time.pdf")
+    savefig(out / "position_time.png")
 
 def plot_world(out: Path):
 
@@ -2221,7 +2221,7 @@ def plot_world(out: Path):
 
     
 
-    savefig(out / "world.pdf")
+    savefig(out / "world.png")
 
 def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
     if "position" not in data:
@@ -2341,7 +2341,7 @@ def plot_uav_path(uav_id: str, data: dict, out: Path, exp_name: str):
 
     
 
-    savefig(out / "path_2d.pdf")
+    savefig(out / "path_2d.png")
 
 
 
@@ -2381,7 +2381,7 @@ def plot_priorities(uav_id: str, data: dict, out: Path, exp_name: str):
 )
 
     
-    savefig(out / "priorities.pdf")
+    savefig(out / "priorities.png")
 
     # Dedicated battery-priority graph.
     if n >= 1:
@@ -2391,7 +2391,7 @@ def plot_priorities(uav_id: str, data: dict, out: Path, exp_name: str):
         ax.set_ylabel("Battery priority")
         #ax.set_title(f"{exp_name} - UAV {uav_id} - Battery priority")
         ax.grid(True, alpha=0.3)
-        savefig(out / "battery_priority.pdf")
+        savefig(out / "battery_priority.png")
 
 
 def plot_voltage(uav_id: str, data: dict, out: Path, exp_name: str):
@@ -2407,7 +2407,7 @@ def plot_voltage(uav_id: str, data: dict, out: Path, exp_name: str):
     ax.set_ylabel("Voltage [V]")
     #ax.set_title(f"{exp_name} - UAV {uav_id} - Battery voltage")
     ax.grid(True, alpha=0.3)
-    savefig(out / "voltage.pdf")
+    savefig(out / "voltage.png")
 
 
 def plot_photosynthesis(uav_id: str, data: dict, out: Path, exp_name: str):
@@ -2423,7 +2423,7 @@ def plot_photosynthesis(uav_id: str, data: dict, out: Path, exp_name: str):
     ax.set_ylabel("Photosynthetic production")
     #ax.set_title(f"{exp_name} - UAV {uav_id} - Photosynthetic production")
     ax.grid(True, alpha=0.3)
-    savefig(out / "photosynthesis.pdf")
+    savefig(out / "photosynthesis.png")
 
 
 def make_individual_uav_plots(uav_id, data, out, exp_name):
@@ -2572,7 +2572,7 @@ def plot_experiment_distances(exp_data, out, exp_name):
 )
 
     
-    savefig(out / "uav_distances.pdf")
+    savefig(out / "uav_distances.png")
 
 
 def plot_experiment_path_and_area(exp_data, out, exp_name):
@@ -2707,7 +2707,7 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
 
     
 
-    savefig(out / "paths_and_covered_area.pdf")
+    savefig(out / "paths_and_covered_area.png")
 
 
 def make_experiment_plots(exp_folder, exp_data):
@@ -2830,7 +2830,7 @@ def plot_aggregated_leader_photosynthesis(
 
     
 
-    savefig(out / "mean_leader_photosynthesis.pdf")
+    savefig(out / "mean_leader_photosynthesis.png")
 
 def plot_aggregated_positions(position_stats, out, setting_name):
     for uav_id, (mean, var) in position_stats.items():
@@ -2855,7 +2855,7 @@ def plot_aggregated_positions(position_stats, out, setting_name):
         axes[-1].set_xlabel("Iteration")
         axes[0].legend(loc="upper left", ncol=2)
         fig.suptitle(f"{setting_name} - UAV {uav_id} - Mean position ± std")
-        savefig(out / f"mean_position_UAV_{uav_id}.pdf")
+        savefig(out / f"mean_position_UAV_{uav_id}.png")
 
 
 def aggregate_scalar_per_uav(all_exp_data, key):
@@ -2897,7 +2897,7 @@ def plot_aggregated_scalar_per_uav(stats, out, setting_name, key, ylabel, filena
         )
 
         
-        savefig(out / f"{filename}_UAV_{uav_id}.pdf")
+        savefig(out / f"{filename}_UAV_{uav_id}.png")
 
 
 def aggregate_priorities(all_exp_data):
@@ -2957,7 +2957,7 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
         )
 
         
-        savefig(out / f"mean_priorities_UAV_{uav_id}.pdf")
+        savefig(out / f"mean_priorities_UAV_{uav_id}.png")
 
         # Battery priority separately
         fig, ax = plt.subplots(figsize=FIGSIZE)
@@ -2981,7 +2981,7 @@ def plot_aggregated_priorities(priority_stats, out, setting_name):
         )
 
         
-        savefig(out / f"mean_battery_priority_UAV_{uav_id}.pdf")
+        savefig(out / f"mean_battery_priority_UAV_{uav_id}.png")
 
 
 def aggregate_distances(all_exp_data):
@@ -3045,7 +3045,7 @@ def plot_aggregated_distances(distance_stats, out, setting_name):
 )
 
     
-    savefig(out / "mean_uav_distances.pdf")
+    savefig(out / "mean_uav_distances.png")
 
 
 def aggregate_paths(all_exp_data):
@@ -3319,7 +3319,7 @@ def plot_aggregated_paths(path_stats, out, setting_name, all_exp_data):
     )
 
     savefig(
-        out / "mean_paths.pdf"
+        out / "mean_paths.png"
     )
 
 # ---------------------------------------------------------------------------

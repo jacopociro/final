@@ -1494,7 +1494,7 @@ def plot_uav_position(
     )
 
     savefig(
-        out / "position_time.pdf"
+        out / "position_time.png"
     )
 
 
@@ -1545,7 +1545,7 @@ def plot_world(
     )
 
     savefig(
-        out / "wolrd.pdf"
+        out / "wolrd.png"
     )
 
 def plot_uav_path(
@@ -1654,7 +1654,7 @@ def plot_uav_path(
     )
 
     savefig(
-        out / "path_2d.pdf"
+        out / "path_2d.png"
     )
 
 def plot_uav_priorities(
@@ -1712,7 +1712,7 @@ def plot_uav_priorities(
     )
 
     savefig(
-        out / "priorities.pdf"
+        out / "priorities.png"
     )
 
     # Battery priority separately.
@@ -1734,7 +1734,7 @@ def plot_uav_priorities(
     ax.grid(True, alpha=0.3)
 
     savefig(
-        out / "battery_priority.pdf"
+        out / "battery_priority.png"
     )
 
 
@@ -1771,7 +1771,7 @@ def plot_uav_voltage(
     ax.grid(True, alpha=0.3)
 
     savefig(
-        out / "voltage.pdf"
+        out / "voltage.png"
     )
 
 
@@ -1940,7 +1940,7 @@ def plot_experiment_distances(
     )
 
     savefig(
-        out / "uav_distances.pdf"
+        out / "uav_distances.png"
     )
 
 
@@ -2058,7 +2058,7 @@ def plot_experiment_path_and_area(
     )
 
     savefig(
-        out / "paths_and_covered_area.pdf"
+        out / "paths_and_covered_area.png"
     )
 
 
@@ -2380,7 +2380,7 @@ def plot_aggregated_positions(
 
         savefig(
             out /
-            f"mean_position_UAV_{uav_id}.pdf"
+            f"mean_position_UAV_{uav_id}.png"
         )
 
 
@@ -2569,7 +2569,7 @@ def plot_aggregated_paths(
     )
 
     savefig(
-        out / "mean_paths.pdf"
+        out / "mean_paths.png"
     )
 
 
@@ -2661,7 +2661,7 @@ def plot_aggregated_coverage(
     )
 
     savefig(
-        out / "mean_covered_area.pdf"
+        out / "mean_covered_area.png"
     )
 
 
@@ -2814,7 +2814,7 @@ def plot_aggregated_priorities(
 
         savefig(
             out /
-            f"mean_priorities_UAV_{uav_id}.pdf"
+            f"mean_priorities_UAV_{uav_id}.png"
         )
 
         # Battery priority separately
@@ -2854,7 +2854,7 @@ def plot_aggregated_priorities(
 
         savefig(
             out /
-            f"mean_battery_priority_UAV_{uav_id}.pdf"
+            f"mean_battery_priority_UAV_{uav_id}.png"
         )
 
 
@@ -2954,7 +2954,7 @@ def plot_aggregated_voltage(
 
         savefig(
             out /
-            f"mean_voltage_UAV_{uav_id}.pdf"
+            f"mean_voltage_UAV_{uav_id}.png"
         )
 
 
@@ -3076,7 +3076,7 @@ def plot_aggregated_distances(
     )
 
     savefig(
-        out / "mean_uav_distances.pdf"
+        out / "mean_uav_distances.png"
     )
 
 
