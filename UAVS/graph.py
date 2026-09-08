@@ -96,22 +96,7 @@ OBSTACLES = [
     # ============================================================
 
     # Folding door / wall around bedroom
-    (-2.46, -6.00),
-    (-2.46, -5.50),
-    (-2.46, -5.00),
-    (-2.46, -4.50),
-    (-2.46, -4.00),
-    (-2.46, -3.50),
-    (-2.46, -3.00),
-    (-2.46, -2.50),
-    (-2.46, -2.00),
-    (-2.46,  0.00),
-    (-2.46,  0.50),
-    (-2.46,  1.00),
-    (-2.46,  1.50),
-    (-2.46,  2.00),
-    (-2.46,  2.50),
-    (-2.46,  3.00),
+
 
 
     # ============================================================
@@ -1755,6 +1740,28 @@ def plot_world_walls(ax):
             linewidth=3,
             zorder=20
         )
+        INTERNAL_WALLS =     [
+        (-2.46, -6.00),
+        (-2.46, -2.00),
+
+        (-2.46,  0.00),
+        (-2.46,  3.00),]
+        ax.plot(
+            [INTERNAL_WALLS[0][0], INTERNAL_WALLS[1][0]],
+            [INTERNAL_WALLS[0][1], INTERNAL_WALLS[1][1]],
+            color="black",
+            linestyle="--",
+            linewidth=3,
+            zorder=20
+        )
+        ax.plot(
+            [INTERNAL_WALLS[2][0], INTERNAL_WALLS[3][0]],
+            [INTERNAL_WALLS[2][1], INTERNAL_WALLS[3][1]],
+            color="black",
+            linestyle="--",
+            linewidth=3,
+            zorder=20
+        )
 
 def mean_var(arrays: list[np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
     """
@@ -2145,11 +2152,11 @@ def plot_world(out: Path):
 
     fig, ax = plt.subplots(figsize=FIGSIZE)
     init_pos = [
-        (4.0, -3.0, 28),
-        (6.0, -3.0, 29),
-        (5.0, -2.0, 30),
-        (4.0, -1.0, 31),
-        (6.0, -1.0, 32),
+        (4.0, -3.0, 1),
+        (6.0, -3.0, 2),
+        (5.0, -2.0, 3),
+        (4.0, -1.0, 4),
+        (6.0, -1.0, 5),
     ]
     colors = ['blue', 'orange', 'green', 'red', 'purple']
     for i, (x,y,id) in enumerate(init_pos):
@@ -2558,7 +2565,27 @@ def plot_experiment_distances(exp_data, out, exp_name):
     t = get_time_axis(arr.shape[1])
 
     for i, pair in enumerate(pairs):
-        ax.plot(t, arr[i], label=f"UAV {pair[0]} - UAV {pair[1]}")
+        if pair[0] == "28":
+            name0 = 2
+        elif pair[0] == "29":
+            name0 = 3
+        elif pair[0] == "30":
+            name0 = 1
+        elif pair[0] == "31":
+            name0 = 4
+        elif pair[0] == "32":
+            name0 = 5
+        if pair[1] == "28":
+            name1 = 2
+        elif pair[1] == "29":
+            name1 = 3
+        elif pair[1] == "30":
+            name1 = 1
+        elif pair[1] == "31":
+            name1 = 4
+        elif pair[1] == "32":
+            name1 = 5
+        ax.plot(t, arr[i], label=f"UAV {name0} - UAV {name1}")
 
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Distance [m]")
@@ -2677,12 +2704,21 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
     # ------------------------------------------------------------------
 
     for xy, uav_id in zip(positions, labels):
-
+        if uav_id == "28":
+            uav_id_ =2
+        elif uav_id == "29":
+            uav_id_ = 3
+        elif uav_id == "30":
+            uav_id_ = 1
+        elif uav_id == "31":   
+            uav_id_ = 4
+        elif uav_id == "32":
+            uav_id_ = 5
         ax.plot(
             xy[:, 0],
             xy[:, 1],
             linewidth=1.2,
-            label=f"UAV {uav_id}"
+            label=f"UAV {uav_id_}"
         )
 
         ax.scatter(
@@ -2709,6 +2745,134 @@ def plot_experiment_path_and_area(exp_data, out, exp_name):
 
     savefig(out / "paths_and_covered_area.png")
 
+def plot_experiment_uav_positions(exp_data, out, exp_name):
+    """
+    Plot X, Y and Z positions of all UAVs in the experiment.
+
+    One separate figure is generated for each coordinate. Each UAV is
+    represented by one line. The x-axis is time, obtained from the row index
+    and TIME_PER_ITERATION.
+    """
+
+    coordinates = {
+        0: ("X position", "X [m]", "uav_positions_x.png"),
+        1: ("Y position", "Y [m]", "uav_positions_y.png"),
+        2: ("Z position", "Z [m]", "uav_positions_z.png"),
+    }
+
+    sorted_uavs = sorted(exp_data.keys(), key=int)
+
+    for coord_idx, (title, ylabel, filename) in coordinates.items():
+        has_data = False
+
+        fig, ax = plt.subplots(figsize=FIGSIZE)
+
+        for uav_id in sorted_uavs:
+            data = exp_data[uav_id]
+
+            if "position" not in data:
+                continue
+
+            position = data["position"]
+
+            if position.ndim != 2 or position.shape[1] <= coord_idx:
+                continue
+
+            values = position[:, coord_idx]
+            valid = np.isfinite(values)
+
+            if not np.any(valid):
+                continue
+
+            t = get_time_axis(len(values))
+            if uav_id == "28":
+                uav_id_ = 2
+            elif uav_id == "29":
+                uav_id_ = 3
+            elif uav_id == "30":
+                uav_id_ = 1
+            elif uav_id == "31":
+                uav_id_ = 4
+            elif uav_id == "32":
+                uav_id_ = 5
+            ax.plot(
+                t[valid],
+                values[valid],
+                linewidth=1.2,
+                label=f"UAV {uav_id_}"
+            )
+            has_data = True
+
+        if not has_data:
+            plt.close(fig)
+            continue
+
+
+        ax.set_ylabel(ylabel)
+
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+
+        savefig(out / filename)
+
+
+def plot_experiment_uav_voltages(exp_data, out, exp_name):
+    """
+    Plot the battery voltage of all UAVs in the experiment.
+
+    One line is generated for each UAV. The x-axis is time, obtained from the
+    row index and TIME_PER_ITERATION.
+    """
+
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    has_data = False
+
+    for uav_id in sorted(exp_data.keys(), key=int):
+        data = exp_data[uav_id]
+
+        if "voltage" not in data:
+            continue
+
+        voltage = np.asarray(data["voltage"], dtype=float).reshape(-1)
+
+        if len(voltage) == 0:
+            continue
+
+        valid = np.isfinite(voltage)
+
+        if not np.any(valid):
+            continue
+
+        t = get_time_axis(len(voltage))
+
+        if uav_id == "28":
+            uav_id_ = 2
+        elif uav_id == "29":
+            uav_id_ = 3
+        elif uav_id == "30":
+            uav_id_ = 1
+        elif uav_id == "31":
+            uav_id_ = 4
+        elif uav_id == "32":
+            uav_id_ = 5
+        ax.plot(
+            t[valid],
+            voltage[valid],
+            linewidth=1.2,
+            label=f"UAV {uav_id_}"
+        )
+        has_data = True
+
+    if not has_data:
+        plt.close(fig)
+        return
+
+    ax.set_ylabel("Voltage [V]")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    savefig(out / "uav_voltages.png")
+
 
 def make_experiment_plots(exp_folder, exp_data):
     out = exp_folder / "plots"
@@ -2717,7 +2881,9 @@ def make_experiment_plots(exp_folder, exp_data):
     exp_name = exp_folder.name
     plot_experiment_distances(exp_data, out, exp_name)
     plot_experiment_path_and_area(exp_data, out, exp_name)
-    plot_experiment_photosynthesis(exp_folder,out,exp_name)
+    plot_experiment_uav_positions(exp_data, out, exp_name)
+    plot_experiment_uav_voltages(exp_data, out, exp_name)
+    plot_experiment_photosynthesis(exp_folder, out, exp_name)
 
 
 # ---------------------------------------------------------------------------
